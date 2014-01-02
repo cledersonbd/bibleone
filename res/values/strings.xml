@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">BibleOne</string>
+    <string name="action_settings">Settings</string>
+    <string name="txtOldTestment">Velho Testamento</string>
+    <string name="txtNewTestment">Novo Testamento</string>
+    <string name="title_activity_book">BookActivity</string>
+    <string name="txtBookName">Livro</string>
+    <string name="chapterLabel">Capítulos</string>
+    <string name="lblSampleNum">1</string>
+    <string name="lblSampleText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
+    <string name="title_activity_verse">VerseActivity</string>
+    <string name="lblChapterVerse">Capítulo</string>
+
+</resources>
