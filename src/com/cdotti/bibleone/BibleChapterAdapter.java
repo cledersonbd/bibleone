@@ -24,6 +24,7 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 	private HashMap<Integer, Integer> indexer;
 	private Integer[] sections;
 	private static final Integer MAX_VERSES_PER_CHAPTER = 3;
+	private static final Integer DIV_PAGE = 10;
 	
 	public BibleChapterAdapter(Context c, String cBookId) {
 		Cursor cursor;
@@ -63,17 +64,16 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 			cursor.close();
 		}
 
-		if (mChapterArr.size() > 0) {
-			for (int i = 0; i < mChapterArr.size(); i++) {
-				Integer item = mChapterArr.get(i).getChapter();
-				Integer chave = (Integer) mChapterArr.get(i).getChapter() % 5;
-				if (!indexer.containsKey(chave))
-					indexer.put(chave, item);
-				
-			}
+		for (int i = 0; i < mChapterArr.size(); i++) {
+			Integer item = mChapterArr.get(i).getChapter();
+			//Integer chave = ((Integer) mChapterArr.get(i).getChapter() - 1) / DIV_PAGE;
+			Integer chave = (Integer) i / DIV_PAGE;
+			if (!indexer.containsKey(chave))
+				indexer.put(chave, item);
+			
 		}
 		
-		ArrayList<Integer> sectionList = new ArrayList<Integer>();
+		ArrayList<Integer> sectionList = new ArrayList<Integer>(indexer.keySet());
 		Collections.sort(sectionList);
 		
 		sections = new Integer[sectionList.size()];
@@ -136,7 +136,7 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 
 	@Override
 	public int getSectionForPosition(int position) {
-		return 0;
+		return position % DIV_PAGE;
 	}
 
 	@Override

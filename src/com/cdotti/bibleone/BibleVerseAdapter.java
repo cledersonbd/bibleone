@@ -1,6 +1,8 @@
 package com.cdotti.bibleone;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,13 +13,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-public class BibleVerseAdapter extends BaseAdapter {
+public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 	private Context mContext;
 	private ArrayList<BibleVerse> mVerseArrList;
 	private BibleDBHelper bibleDBHelper;
 	private SQLiteDatabase bibleDB;
+	private HashMap<Integer, Integer> indexer;
+	private Integer[] sections;
+	private static final Integer DIV_PAGE = 3;
 	
 	// Construtor quando se passam os IDs do livro e cap’tulo
 	public BibleVerseAdapter(Context c, Integer nBookID, Integer nChapterID) {		
@@ -29,6 +35,7 @@ public class BibleVerseAdapter extends BaseAdapter {
 		bibleDBHelper = new BibleDBHelper(mContext);
 		bibleDB = bibleDBHelper.openDatabase();
 		mVerseArrList = new ArrayList<BibleVerse>();
+		indexer = new HashMap<Integer, Integer>();
 		
 		cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ", new String[] {nBookID.toString(), nChapterID.toString()});
 		try {
@@ -42,6 +49,20 @@ public class BibleVerseAdapter extends BaseAdapter {
 		} finally {
 			cursor.close();
 		}
+		
+		for (int i = 0; i < mVerseArrList.size(); i++) {
+			Integer item = mVerseArrList.get(i).getId();
+			Integer chave = (Integer) i / DIV_PAGE;
+			if (!indexer.containsKey(chave))
+				indexer.put(chave, item);
+			
+		}
+		
+		ArrayList<Integer> sectionList = new ArrayList<Integer>(indexer.keySet());
+		Collections.sort(sectionList);
+		
+		sections = new Integer[sectionList.size()];
+		sections = sectionList.toArray(sections);
 		
 	}
 	// Construtor quando se passa os vers’culos j‡ prontos
@@ -93,6 +114,18 @@ public class BibleVerseAdapter extends BaseAdapter {
 		verseText.setTextColor(Color.DKGRAY);
 		
 		return customView;
+	}
+	@Override
+	public int getPositionForSection(int sectionIndexer) {
+		return indexer.get(sections[sectionIndexer]);
+	}
+	@Override
+	public int getSectionForPosition(int position) {
+		return position % DIV_PAGE;
+	}
+	@Override
+	public Object[] getSections() {
+		return sections;
 	}
 
 }

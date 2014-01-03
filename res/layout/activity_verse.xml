@@ -21,7 +21,8 @@
         android:id="@+id/listVerse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" 
-        android:divider="@null">
+        android:divider="@null"
+        android:fastScrollEnabled="true">
     </ListView>
 
 </LinearLayout>
