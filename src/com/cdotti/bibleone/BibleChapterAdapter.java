@@ -51,7 +51,7 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 					chapterVerse = new ArrayList<BibleVerse>();
 					
 					while (!cursor.isAfterLast() && cursor.getInt(2) == chapter) {
-						chapterVerse.add(new BibleVerse(cursor.getInt(3), cursor.getString(4)));
+						chapterVerse.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));
 						cursor.moveToNext();
 					}
 

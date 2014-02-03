@@ -1,37 +1,54 @@
 package com.cdotti.bibleone;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.os.Build;
 
 public class VerseActivity extends Activity implements OnItemClickListener {
+	private TextView textView;
 	private ListView listVerse;
+	private Integer bookID;
+	private Integer chapterNum;
+	private Integer currentChapterNum;
+	private ProgressDialog mDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left);
 		setContentView(R.layout.activity_verse);
+		
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
 		Bundle extras = getIntent().getExtras();
-		Integer bookID = extras.getInt("bookID");
-		Integer chapterNum = extras.getInt("chapterNum");
-		//ArrayList<BibleVerse> verseList = extras.getParcelableArrayList("com.cdotti.bibleone.BibleVerse");
+		bookID = extras.getInt("bookID");
+		chapterNum = extras.getInt("chapterNum");
+		currentChapterNum = chapterNum;
+		String bookName = extras.getString("titleName");
+		
+		this.setTitle(bookName);
+		
+		textView = (TextView) findViewById(R.id.lblVerseListHeaderText);
+		textView.setText(getResources().getString(R.string.chapterLabel) + " " + chapterNum.toString());
 		
 		listVerse = (ListView) findViewById(R.id.listVerse);
 		listVerse.setAdapter(new BibleVerseAdapter(getApplicationContext(), bookID, chapterNum));
 		listVerse.setOnItemClickListener(this);
-		
 	}
 
 	/**
@@ -81,9 +98,10 @@ public class VerseActivity extends Activity implements OnItemClickListener {
 	}
 	
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-		// TODO Auto-generated method stub
+	public void onItemClick(AdapterView<?> parentView, View view, int arg2, long arg3) {
+		TextView txtNumView = (TextView) view.findViewById(R.id.lblVerseNum);
 		
+		if (txtNumView != null)
+			Toast.makeText(getApplicationContext(), txtNumView.getText(), Toast.LENGTH_SHORT).show();
 	}
-
 }

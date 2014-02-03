@@ -27,15 +27,19 @@ public class ChapterActivity extends Activity implements OnItemClickListener {
 		// Show the Up button in the action bar.
 		setupActionBar();
 		
+		Integer chapter_id = 1;
+		
 		Bundle extras = getIntent().getExtras();
-		Integer chapter_id = extras.getInt("bookID");
-		String bookName = extras.getString("bookName");
-		
-		// Seta o titulo
-		this.setTitle(bookName + " - " + getString(R.string.chapterLabel));
-		
-		textView = (TextView) findViewById(R.id.lblBookName);
-		textView.setText(bookName);
+		if (extras != null) {
+			chapter_id = extras.getInt("bookID");
+			String bookName = extras.getString("bookName");
+			
+			// Seta o titulo
+			this.setTitle(bookName + " - " + getString(R.string.chapterLabel));
+			
+			textView = (TextView) findViewById(R.id.lblBookName);
+			textView.setText(bookName);
+		}
 		
 		// Binding utilizado nas paradas
 		listChapter = (ListView) findViewById(R.id.listBookVerse);
@@ -90,14 +94,15 @@ public class ChapterActivity extends Activity implements OnItemClickListener {
 	}
 
 	 // Listener para os cliques nos capitulos da biblia
-		@Override
-		public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-			Intent intent = new Intent(getApplicationContext(), VerseActivity.class);
-			
-			intent.putExtra("bookID", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getBook_id());
-			intent.putExtra("chapterNum", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getChapter());
-			//intent.putParcelableArrayListExtra("com.cdotti.bibleone.BibleVerse", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getArrListText());
-			
-			startActivity(intent);
-		}
+	@Override
+	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+		Intent intent = new Intent(getApplicationContext(), VerseActivity.class);
+		
+		intent.putExtra("bookID", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getBook_id());
+		intent.putExtra("chapterNum", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getChapter());
+		intent.putExtra("titleName", this.getTitle());
+		//intent.putParcelableArrayListExtra("com.cdotti.bibleone.BibleVerse", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getArrListText());
+		
+		startActivity(intent);
+	}
 }
