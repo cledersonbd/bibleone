@@ -1,6 +1,7 @@
 package com.cdotti.bibleone;
 
 import android.os.Bundle;
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -24,7 +25,8 @@ public class BookFragment extends Fragment implements OnItemClickListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.activitymainlayout, container, false);
+		View view = inflater.inflate(R.layout.activity_main, container, false);
+		
         // Binding utilizado nas paradas
         gridOldTest = (GridView) view.findViewById(R.id.gridOldTest);
         gridOldTest.setAdapter(new BibleBookAdapter(container.getContext(), "1"));
@@ -44,6 +46,12 @@ public class BookFragment extends Fragment implements OnItemClickListener {
 	public void onPause() {
 		
 		super.onPause();
+	}
+	
+	@Override
+	public void onAttach(Activity activity) {
+		// TODO Auto-generated method stub
+		super.onAttach(activity);
 	}
 
     // Listener para os cliques nos livros da biblia (Velho/Novo Testamento)

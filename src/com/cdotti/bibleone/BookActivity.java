@@ -3,7 +3,6 @@ package com.cdotti.bibleone;
 import android.os.Bundle;
 import android.app.Activity;
 import android.content.Intent;
-import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,7 +16,7 @@ public class BookActivity extends Activity implements OnItemClickListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_frag);
         	
         // Binding utilizado nas paradas
         gridOldTest = (GridView) findViewById(R.id.gridOldTest);
