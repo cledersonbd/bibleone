@@ -15,6 +15,14 @@
     <string name="lblPrefColorSchema">Esquema de Cor</string>
     <string name="lblPrefColorSchemaExplained">Modifica o esquema de cores dos textos.</string>
     <string name="lblPrefScreenTitle">Configurações</string>
-    <string name="lblPrefScreenTitleExplained">Aqui é onde você configura sua bíblia como quiser...</string>
+    <string name="lblPrefScreenTitleExplained">Aqui é onde você configura sua bíblia como quiser</string>
+    <string name="lblVersion">Versão:</string>
+    <string name="lblVersionNumber">X.X.X</string>
+    <string name="drawer_open">Gaveta aberta</string>
+    <string name="drawer_close">Gaveta fechada</string>
+    <string-array name="drawerArray">
+        <item >Teste</item>
+        <item >Sobre</item>
+    </string-array>
 
 </resources>
