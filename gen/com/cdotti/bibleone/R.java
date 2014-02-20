@@ -14,6 +14,9 @@ public final class R {
         public static final int activity_slide_out_to_left=0x7f040002;
         public static final int activity_slide_out_to_right=0x7f040003;
     }
+    public static final class array {
+        public static final int drawerArray=0x7f080000;
+    }
     public static final class attr {
     }
     public static final class dimen {
@@ -23,52 +26,84 @@ public final class R {
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
          */
-        public static final int activity_horizontal_margin=0x7f050000;
-        public static final int activity_vertical_margin=0x7f050001;
+        public static final int activity_horizontal_margin=0x7f060000;
+        public static final int activity_vertical_margin=0x7f060001;
     }
     public static final class drawable {
-        public static final int ic_launcher=0x7f020000;
-        public static final int shape_textview=0x7f020001;
+        public static final int ic_drawer=0x7f020000;
+        public static final int ic_launcher=0x7f020001;
+        public static final int ribbon=0x7f020002;
+        public static final int shape_textview=0x7f020003;
     }
     public static final class id {
-        public static final int action_settings=0x7f09000c;
-        public static final int gridNewTest=0x7f090005;
-        public static final int gridOldTest=0x7f090003;
-        public static final int lblBookName=0x7f090000;
-        public static final int lblChapterNum=0x7f090008;
-        public static final int lblChapterTextView=0x7f090009;
-        public static final int lblNewTest=0x7f090004;
-        public static final int lblOldTest=0x7f090002;
-        public static final int lblVerseNum=0x7f09000a;
-        public static final int lblVerseTextView=0x7f09000b;
-        public static final int listBookVerse=0x7f090001;
-        public static final int listVerse=0x7f090007;
-        public static final int textViewChapterVerses=0x7f090006;
+        public static final int action_settings=0x7f0b001a;
+        public static final int book_fragment=0x7f0b000e;
+        public static final int chapter_fragment=0x7f0b000f;
+        public static final int content_frame=0x7f0b000b;
+        public static final int drawer_layout=0x7f0b000a;
+        public static final int fragment_container_large=0x7f0b000d;
+        public static final int generic_content_frame=0x7f0b0015;
+        public static final int gridNewTest=0x7f0b0007;
+        public static final int gridOldTest=0x7f0b0005;
+        public static final int imgAboutLogo=0x7f0b0000;
+        public static final int imgRibbon=0x7f0b0011;
+        public static final int lblBookName=0x7f0b0008;
+        public static final int lblChapterNum=0x7f0b0012;
+        public static final int lblChapterTextView=0x7f0b0013;
+        public static final int lblNewTest=0x7f0b0006;
+        public static final int lblOldTest=0x7f0b0004;
+        public static final int lblVerseListHeaderText=0x7f0b0017;
+        public static final int lblVerseNum=0x7f0b0018;
+        public static final int lblVerseTextView=0x7f0b0019;
+        public static final int left_drawer=0x7f0b000c;
+        public static final int listBookVerse=0x7f0b0009;
+        public static final int listVerse=0x7f0b0010;
+        public static final int progressBar=0x7f0b0016;
+        public static final int textView1=0x7f0b0001;
+        public static final int txtVersionLabel=0x7f0b0002;
+        public static final int txtVersionNumber=0x7f0b0003;
+        public static final int txtViewListItemDrawer=0x7f0b0014;
     }
     public static final class layout {
-        public static final int activity_chapter=0x7f030000;
-        public static final int activity_main=0x7f030001;
-        public static final int activity_verse=0x7f030002;
-        public static final int chapter_list_row=0x7f030003;
-        public static final int verse_list_row=0x7f030004;
+        public static final int activity_about=0x7f030000;
+        public static final int activity_book=0x7f030001;
+        public static final int activity_chapter=0x7f030002;
+        public static final int activity_main_frag=0x7f030003;
+        public static final int activity_verse=0x7f030004;
+        public static final int chapter_list_row=0x7f030005;
+        public static final int drawer_main_item=0x7f030006;
+        public static final int generic_activity_frag=0x7f030007;
+        public static final int pending_verse_row=0x7f030008;
+        public static final int verse_list_header_row=0x7f030009;
+        public static final int verse_list_row=0x7f03000a;
     }
     public static final class menu {
-        public static final int book=0x7f080000;
-        public static final int main=0x7f080001;
-        public static final int verse=0x7f080002;
+        public static final int book=0x7f0a0000;
+        public static final int main=0x7f0a0001;
+        public static final int verse=0x7f0a0002;
     }
     public static final class string {
-        public static final int action_settings=0x7f060001;
-        public static final int app_name=0x7f060000;
-        public static final int chapterLabel=0x7f060006;
-        public static final int lblChapterVerse=0x7f06000a;
-        public static final int lblSampleNum=0x7f060007;
-        public static final int lblSampleText=0x7f060008;
-        public static final int title_activity_book=0x7f060004;
-        public static final int title_activity_verse=0x7f060009;
-        public static final int txtBookName=0x7f060005;
-        public static final int txtNewTestment=0x7f060003;
-        public static final int txtOldTestment=0x7f060002;
+        public static final int action_settings=0x7f070001;
+        public static final int app_name=0x7f070000;
+        public static final int chapterLabel=0x7f070006;
+        public static final int drawer_close=0x7f070012;
+        public static final int drawer_open=0x7f070011;
+        public static final int lblChapterVerse=0x7f07000a;
+        public static final int lblPrefColorSchema=0x7f07000b;
+        public static final int lblPrefColorSchemaExplained=0x7f07000c;
+        public static final int lblPrefScreenTitle=0x7f07000d;
+        public static final int lblPrefScreenTitleExplained=0x7f07000e;
+        public static final int lblSampleNum=0x7f070007;
+        public static final int lblSampleText=0x7f070008;
+        public static final int lblVersion=0x7f07000f;
+        public static final int lblVersionNumber=0x7f070010;
+        public static final int strMenu=0x7f070014;
+        public static final int strRibbon=0x7f070013;
+        public static final int title_activity_book=0x7f070004;
+        public static final int title_activity_verse=0x7f070009;
+        public static final int txtBookName=0x7f070005;
+        public static final int txtNewTestment=0x7f070003;
+        public static final int txtOldTestment=0x7f070002;
     }
     public static final class style {
         /** 
@@ -92,10 +127,13 @@ public final class R {
     
  API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f070000;
+        public static final int AppBaseTheme=0x7f090000;
         /**  Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f070001;
+        public static final int AppTheme=0x7f090001;
+    }
+    public static final class xml {
+        public static final int preference_screen=0x7f050000;
     }
 }

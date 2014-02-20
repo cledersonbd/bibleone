@@ -1,50 +1,52 @@
 package com.cdotti.bibleone;
 
-import android.os.Bundle;
-import android.app.Activity;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
-import android.widget.TextView;
-import android.support.v4.app.NavUtils;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 
-public class ChapterActivity extends Activity implements OnItemClickListener {
-	private ListView listChapter;
-	private TextView textView;
+public class ChapterActivity extends FragmentActivity implements ChapterFragment.OnChapterSelectedListener {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left);
-		setContentView(R.layout.activity_chapter);
+		setContentView(R.layout.generic_activity_frag);
 		
 		// Show the Up button in the action bar.
 		setupActionBar();
-		
+
 		Integer chapter_id = 1;
+		String bookName = "";
 		
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			chapter_id = extras.getInt("bookID");
-			String bookName = extras.getString("bookName");
-			
+			bookName = extras.getString("bookName");
 			// Seta o titulo
 			this.setTitle(bookName + " - " + getString(R.string.chapterLabel));
-			
-			textView = (TextView) findViewById(R.id.lblBookName);
-			textView.setText(bookName);
 		}
+
+		Bundle args = new Bundle();
+		args.putInt("bookID", chapter_id);
+		args.putString("bookName", bookName);
 		
-		// Binding utilizado nas paradas
-		listChapter = (ListView) findViewById(R.id.listBookVerse);
-		listChapter.setAdapter(new BibleChapterAdapter(getApplicationContext(), chapter_id.toString()));
-		listChapter.setOnItemClickListener(this);
+		ChapterFragment chapterFragment;
+		chapterFragment = new ChapterFragment();
+		chapterFragment.setArguments(args);
+		
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction fragTrans = fm.beginTransaction();
+		fragTrans.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
+				R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
+		fragTrans.replace(R.id.generic_content_frame, chapterFragment);
+		fragTrans.commit();
 	}
 
 	/**
@@ -93,16 +95,17 @@ public class ChapterActivity extends Activity implements OnItemClickListener {
 		super.onResume();
 	}
 
-	 // Listener para os cliques nos capitulos da biblia
 	@Override
-	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	public void onChapterSelected(Integer bookid, Integer chapterid) {
+		
 		Intent intent = new Intent(getApplicationContext(), VerseActivity.class);
 		
-		intent.putExtra("bookID", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getBook_id());
-		intent.putExtra("chapterNum", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getChapter());
+		intent.putExtra("bookID", bookid);
+		intent.putExtra("chapterNum", chapterid);
 		intent.putExtra("titleName", this.getTitle());
 		//intent.putParcelableArrayListExtra("com.cdotti.bibleone.BibleVerse", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getArrListText());
 		
 		startActivity(intent);
+		
 	}
 }

@@ -175,7 +175,8 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 				verseText.setTypeface(tf);
 			}
 			if (verseChapterText != null) {
-				verseChapterText.setText("Cap’tulo " + mVerseArrList.get(position).getNumChapter().toString());
+				verseChapterText.setText(mContext.getResources().getString(R.string.chapterLabel) + " " +
+						mVerseArrList.get(position).getNumChapter().toString());
 				verseChapterText.setTextColor(Color.BLACK);
 			}
 		}

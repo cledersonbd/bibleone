@@ -1,15 +1,9 @@
 package com.cdotti.bibleone;
 
-import java.util.ArrayList;
-
 import android.content.Context;
-import android.database.Cursor;
-import android.os.AsyncTask;
 import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListAdapter;
-import android.widget.Toast;
 
 public class EndlessScrollListener implements OnScrollListener {
 	private Context mContext;

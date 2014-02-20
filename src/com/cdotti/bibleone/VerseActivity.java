@@ -1,36 +1,29 @@
 package com.cdotti.bibleone;
 
-import android.os.AsyncTask;
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
-import android.app.Activity;
-import android.app.ProgressDialog;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AbsListView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.support.v4.app.NavUtils;
-import android.annotation.TargetApi;
-import android.os.Build;
 
-public class VerseActivity extends Activity implements OnItemClickListener {
-	private TextView textView;
-	private ListView listVerse;
+public class VerseActivity extends FragmentActivity implements OnItemClickListener, VerseFragment.OnSelectedVerseListener {
 	private Integer bookID;
 	private Integer chapterNum;
-	private Integer currentChapterNum;
-	private ProgressDialog mDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		overridePendingTransition(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left);
-		setContentView(R.layout.activity_verse);
+		setContentView(R.layout.generic_activity_frag);
 		
 		// Show the Up button in the action bar.
 		setupActionBar();
@@ -38,17 +31,25 @@ public class VerseActivity extends Activity implements OnItemClickListener {
 		Bundle extras = getIntent().getExtras();
 		bookID = extras.getInt("bookID");
 		chapterNum = extras.getInt("chapterNum");
-		currentChapterNum = chapterNum;
 		String bookName = extras.getString("titleName");
 		
 		this.setTitle(bookName);
 		
-		textView = (TextView) findViewById(R.id.lblVerseListHeaderText);
-		textView.setText(getResources().getString(R.string.chapterLabel) + " " + chapterNum.toString());
+		Bundle args = new Bundle();
+		args.putInt("bookID", bookID);
+		args.putInt("chapterNum", chapterNum);
+		args.putString("titleName", bookName);
 		
-		listVerse = (ListView) findViewById(R.id.listVerse);
-		listVerse.setAdapter(new BibleVerseAdapter(getApplicationContext(), bookID, chapterNum));
-		listVerse.setOnItemClickListener(this);
+		VerseFragment verseFragment;
+		verseFragment = new VerseFragment();
+		verseFragment.setArguments(args);
+		
+		FragmentManager fm = getSupportFragmentManager();
+		FragmentTransaction fragTrans = fm.beginTransaction();
+		fragTrans.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
+				R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
+		fragTrans.replace(R.id.generic_content_frame, verseFragment);
+		fragTrans.commit();
 	}
 
 	/**
@@ -103,5 +104,13 @@ public class VerseActivity extends Activity implements OnItemClickListener {
 		
 		if (txtNumView != null)
 			Toast.makeText(getApplicationContext(), txtNumView.getText(), Toast.LENGTH_SHORT).show();
+	}
+
+	@Override
+	public void onSelectedVerse(Integer verseNum) {
+		
+		if (verseNum != null)
+			Toast.makeText(this.getApplicationContext(), verseNum.toString(), Toast.LENGTH_SHORT).show();
+		
 	}
 }

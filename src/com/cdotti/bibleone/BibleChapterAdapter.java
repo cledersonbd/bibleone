@@ -29,7 +29,7 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 	public BibleChapterAdapter(Context c, String cBookId) {
 		Cursor cursor;
 		int id = -1;
-		int book_id = -1;
+		Integer book_id = -1;
 		int chapter = 1;
 		ArrayList<BibleVerse> chapterVerse = new ArrayList<BibleVerse>();
 		

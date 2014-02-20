@@ -1,6 +1,8 @@
 package com.cdotti.bibleone;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,18 +10,36 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.support.v4.app.Fragment;
-import android.content.Intent;
 
 public class ChapterFragment extends Fragment implements OnItemClickListener {
 	private ListView listChapter;
 	private TextView textView;
+	OnChapterSelectedListener mChapterSelectedCallback;
+	
+	// Container Activity must implement this interface
+	public interface OnChapterSelectedListener {
+		public void onChapterSelected(Integer bookid, Integer chapterid);
+	}
 
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		
+		// This makes sure that the container activity has implemented
+        // the callback interface. If not, it throws an exception
+        try {
+        	mChapterSelectedCallback = (OnChapterSelectedListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnChapterSelectedListener");
+        }
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		
-		View view = inflater.inflate(R.layout.activity_chapter, container);
+		View view = inflater.inflate(R.layout.activity_chapter, container, false);
 		
 		Integer chapter_id = 1;
 		
@@ -36,19 +56,22 @@ public class ChapterFragment extends Fragment implements OnItemClickListener {
 		listChapter = (ListView) view.findViewById(R.id.listBookVerse);
 		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), chapter_id.toString()));
 		listChapter.setOnItemClickListener(this);
-		return super.onCreateView(inflater, container, savedInstanceState);
+		return view;
 	}
 
 	 // Listener para os cliques nos capitulos da biblia
 	@Override
 	public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		Intent intent = new Intent(getActivity().getApplicationContext(), VerseActivity.class);
+		BibleChapterAdapter chapterAdapter = ((BibleChapterAdapter) listChapter.getAdapter());
+		BibleChapter bookChapter = chapterAdapter.getItem(position);
 		
-		intent.putExtra("bookID", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getBook_id());
-		intent.putExtra("chapterNum", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getChapter());
-		intent.putExtra("titleName", getActivity().getTitle());
-		//intent.putParcelableArrayListExtra("com.cdotti.bibleone.BibleVerse", ((BibleChapterAdapter) listChapter.getAdapter()).getItem(position).getArrListText());
+		// Send the event to the host activity
+        mChapterSelectedCallback.onChapterSelected(bookChapter.getBook_id(), bookChapter.getChapter());
+	}
+	
+	public void updateContent(Integer bookID) {
 		
-		startActivity(intent);
+		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), bookID.toString()));
+		listChapter.invalidate();
 	}
 }

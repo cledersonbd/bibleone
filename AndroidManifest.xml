@@ -13,10 +13,12 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!-- Activity principal - contem os livros -->
         <activity
             android:name="com.cdotti.bibleone.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -28,7 +30,8 @@
             android:name="com.cdotti.bibleone.ChapterActivity"
             android:label="@string/title_activity_book"
             android:parentActivityName="com.cdotti.bibleone.MainActivity"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cdotti.bibleone.MainActivity" />
@@ -38,7 +41,8 @@
             android:name="com.cdotti.bibleone.VerseActivity"
             android:label="@string/title_activity_verse"
             android:parentActivityName="com.cdotti.bibleone.ChapterActivity" 
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cdotti.bibleone.ChapterActivity" />

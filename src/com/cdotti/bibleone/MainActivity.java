@@ -2,6 +2,7 @@ package com.cdotti.bibleone;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -20,15 +21,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class MainActivity extends FragmentActivity implements OnItemClickListener {
+public class MainActivity extends FragmentActivity 
+			implements	OnItemClickListener, 
+						BookFragment.OnBookSelectedListener,
+						ChapterFragment.OnChapterSelectedListener {
 	private String[] mMenuList;
 	private ListView mDrawerList;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	
-	private String mAppTitle = "BibleOne";
-	
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -48,32 +50,50 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 				R.string.drawer_close){
 
             /** Called when a drawer has settled in a completely closed state. */
-            public void onDrawerClosed(View view) {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+			public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
-                getActionBar().setTitle(mAppTitle);
-                invalidateOptionsMenu();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                	getActionBar().setTitle(getResources().getString(R.string.app_name));
+                	invalidateOptionsMenu();
+                }
             }
 
             /** Called when a drawer has settled in a completely open state. */
-            public void onDrawerOpened(View drawerView) {
+            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+			public void onDrawerOpened(View drawerView) {
                 super.onDrawerOpened(drawerView);
-                getActionBar().setTitle("Menu");
-                invalidateOptionsMenu();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                	getActionBar().setTitle(getResources().getString(R.string.strMenu));
+                	invalidateOptionsMenu();
+                }
             }
         };
 		
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 		
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+			getActionBar().setHomeButtonEnabled(true);
 		
 		Fragment bookFragment;
 		bookFragment = new BookFragment();
+		//Fragment chapterFragment;
+		//chapterFragment = new ChapterFragment();
 		
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction fragTrans = fm.beginTransaction();
-		fragTrans.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left);
-		fragTrans.replace(R.id.content_frame, bookFragment);
+		fragTrans.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
+				R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
+		
+		// Se estivermos no dual-pane layout
+		if (fm.findFragmentById(R.id.book_fragment) != null) {
+			fragTrans.replace(R.id.book_fragment, bookFragment);
+		} else {
+			fragTrans.replace(R.id.content_frame, bookFragment);
+		}
+		
 		fragTrans.commit();
 		
 	}
@@ -114,6 +134,7 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
     }
 	*/
 	
+	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		Context mContext = getApplicationContext();
@@ -146,6 +167,32 @@ public class MainActivity extends FragmentActivity implements OnItemClickListene
 			mDrawerLayout.closeDrawer(Gravity.START);
 			
 		}			
+		
+	}
+
+	/** This is a callback that the list fragment (Fragment A) calls
+    when a list item is selected */
+	@Override
+	public void onBookSelected(Integer bookID, String bookName) {
+		ChapterFragment chapterFrag = (ChapterFragment) getSupportFragmentManager().findFragmentById(R.id.chapter_fragment);
+		
+		if (chapterFrag == null) {
+			// single-pane layout
+			Intent intent = new Intent(getApplicationContext(), ChapterActivity.class);
+			
+			intent.putExtra("bookID", bookID);
+			intent.putExtra("bookName", bookName);
+			
+			startActivity(intent);
+		} else  {
+			// dual-pane layout
+			chapterFrag.updateContent(bookID);
+		}
+	}
+
+	@Override
+	public void onChapterSelected(Integer bookid, Integer chapterid) {
+		
 		
 	}
 }

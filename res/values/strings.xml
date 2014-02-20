@@ -3,26 +3,28 @@
 
     <string name="app_name">BibleOne</string>
     <string name="action_settings">Settings</string>
-    <string name="txtOldTestment">Velho Testamento</string>
-    <string name="txtNewTestment">Novo Testamento</string>
-    <string name="title_activity_book">BookActivity</string>
-    <string name="txtBookName">Livro</string>
-    <string name="chapterLabel">Capítulo</string>
+    <string name="txtOldTestment">Old Testment</string>
+    <string name="txtNewTestment">New Testment</string>
+    <string name="title_activity_book">BibleOne</string>
+    <string name="txtBookName">Book</string>
+    <string name="chapterLabel">Chapter</string>
     <string name="lblSampleNum">1</string>
     <string name="lblSampleText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="title_activity_verse">VerseActivity</string>
-    <string name="lblChapterVerse">Capítulo</string>
-    <string name="lblPrefColorSchema">Esquema de Cor</string>
-    <string name="lblPrefColorSchemaExplained">Modifica o esquema de cores dos textos.</string>
-    <string name="lblPrefScreenTitle">Configurações</string>
-    <string name="lblPrefScreenTitleExplained">Aqui é onde você configura sua bíblia como quiser</string>
-    <string name="lblVersion">Versão:</string>
+    <string name="lblChapterVerse">Chapter</string>
+    <string name="lblPrefColorSchema">Color Schema</string>
+    <string name="lblPrefColorSchemaExplained">Changes the text color schema throughout the app.</string>
+    <string name="lblPrefScreenTitle">Settings</string>
+    <string name="lblPrefScreenTitleExplained">This is where you set up your Bible as you want</string>
+    <string name="lblVersion">Version:</string>
     <string name="lblVersionNumber">X.X.X</string>
-    <string name="drawer_open">Gaveta aberta</string>
-    <string name="drawer_close">Gaveta fechada</string>
+    <string name="drawer_open">Drawer open</string>
+    <string name="drawer_close">Drawer closed</string>
     <string-array name="drawerArray">
-        <item >Teste</item>
-        <item >Sobre</item>
+        <item >Test</item>
+        <item >About</item>
     </string-array>
+    <string name="strRibbon">Bookmark your progress.</string>
+    <string name="strMenu">Menu</string>
 
 </resources>
