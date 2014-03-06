@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -19,16 +18,34 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
-public class MainActivity extends FragmentActivity 
+public class MainActivity extends BaseActivity 
 			implements	OnItemClickListener, 
 						BookFragment.OnBookSelectedListener,
 						ChapterFragment.OnChapterSelectedListener {
+	
+	private Boolean isDualPane = false;
+	
 	private String[] mMenuList;
 	private ListView mDrawerList;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
+	
+	private final static String TAG_BOOK_FRAG = "bookFrag";
+	private final static String TAG_CHAPTER_FRAG = "chapterFrag";
+	
+	private final static Integer MATCH_PARENT = android.support.v4.widget.DrawerLayout.LayoutParams.MATCH_PARENT;
+	
+	private ChapterFragment chapterFrag = new ChapterFragment();
+	private BookFragment bookFragment = new BookFragment();
+	
+	private FragmentManager mFragmentManager;
+	
+	private FrameLayout mBookFrameLayout;
+	private FrameLayout mChapterFrameLayout;
 	
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
@@ -36,6 +53,9 @@ public class MainActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_frag);
 		
+		// Se o layout de mainFrame esta existe == dual pane
+		isDualPane = findViewById(R.id.mainFrameLayout) != null;
+			
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mMenuList = getResources().getStringArray(R.array.drawerArray);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -77,19 +97,24 @@ public class MainActivity extends FragmentActivity
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 			getActionBar().setHomeButtonEnabled(true);
 		
-		Fragment bookFragment;
-		bookFragment = new BookFragment();
-		//Fragment chapterFragment;
-		//chapterFragment = new ChapterFragment();
+		mBookFrameLayout = (FrameLayout) findViewById(R.id.mainFrameLayout);
+		mChapterFrameLayout = (FrameLayout) findViewById(R.id.chapterFrameLayout);
 		
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction fragTrans = fm.beginTransaction();
+		mFragmentManager = getSupportFragmentManager();
+		FragmentTransaction fragTrans = mFragmentManager.beginTransaction();
 		fragTrans.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
 				R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
 		
 		// Se estivermos no dual-pane layout
-		if (fm.findFragmentById(R.id.book_fragment) != null) {
-			fragTrans.replace(R.id.book_fragment, bookFragment);
+		if (isDualPane) {
+			fragTrans.add(R.id.mainFrameLayout, bookFragment, TAG_BOOK_FRAG);
+			mFragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+				
+				@Override
+				public void onBackStackChanged() {
+					setLayout();				
+				}
+			});
 		} else {
 			fragTrans.replace(R.id.content_frame, bookFragment);
 		}
@@ -98,7 +123,18 @@ public class MainActivity extends FragmentActivity
 		
 	}
 	
-    @Override
+    protected void setLayout() {
+		
+		if (!chapterFrag.isAdded()) {
+			mBookFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+			mChapterFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(0, MATCH_PARENT));
+		} else {
+			mBookFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(0, MATCH_PARENT, 1f));
+			mChapterFrameLayout.setLayoutParams(new LinearLayout.LayoutParams(0, MATCH_PARENT, 2f));
+		}
+	}
+
+	@Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
@@ -134,6 +170,9 @@ public class MainActivity extends FragmentActivity
     }
 	*/
 	
+	/**
+	 * Funcao para o meno lateral - DrawerMenu
+	 */
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -166,7 +205,10 @@ public class MainActivity extends FragmentActivity
 			// Fecha a gaveta
 			mDrawerLayout.closeDrawer(Gravity.START);
 			
-		}			
+		}
+		else if (position == 0) {
+			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
+		}
 		
 	}
 
@@ -174,19 +216,33 @@ public class MainActivity extends FragmentActivity
     when a list item is selected */
 	@Override
 	public void onBookSelected(Integer bookID, String bookName) {
-		ChapterFragment chapterFrag = (ChapterFragment) getSupportFragmentManager().findFragmentById(R.id.chapter_fragment);
+		FragmentManager fm;
+		FragmentTransaction ft;
 		
-		if (chapterFrag == null) {
-			// single-pane layout
+		// single-pane layout
+		if (!isDualPane) {
 			Intent intent = new Intent(getApplicationContext(), ChapterActivity.class);
 			
 			intent.putExtra("bookID", bookID);
 			intent.putExtra("bookName", bookName);
 			
 			startActivity(intent);
+		// dual-pane layout
 		} else  {
-			// dual-pane layout
-			chapterFrag.updateContent(bookID);
+			if (!chapterFrag.isAdded()) {
+				fm = getSupportFragmentManager();
+				ft = fm.beginTransaction();
+				Bundle args = new Bundle();
+				args.putInt("bookID", bookID);
+				args.putString(bookName, bookName);			
+				chapterFrag.setArguments(args);
+				ft.add(R.id.chapterFrameLayout, chapterFrag, TAG_CHAPTER_FRAG);
+				ft.addToBackStack(null);
+				ft.commit();
+				fm.executePendingTransactions();
+			} else {
+				chapterFrag.updateContent(bookID);	
+			}
 		}
 	}
 

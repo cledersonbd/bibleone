@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="appColorArray_entries">
+        <item>Padrão</item>
+        <item>Preto no Branco</item>
+        <item>Branco no Preto</item>
+        <item>Cinza no Preto</item>
+    </string-array>    
+    <string-array name="appColorArray_entry_values">
+        <item>AppTheme</item>
+        <item>AppThemePB</item>
+        <item>AppThemeBP</item>
+        <item>AppThemeCP</item>
+    </string-array>
+</resources>

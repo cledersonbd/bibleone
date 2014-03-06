@@ -69,7 +69,9 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		
 		mVerseArrList = aVerseList;
 	}
-	
+	/**
+	 * Função utilizada para construir as seções (capítulos) da listView
+	 */
 	private void buildSections() {
 		for (int i = 0; i < mVerseArrList.size(); i++) {
 			Integer item = mVerseArrList.get(i).getId();
@@ -135,15 +137,29 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View customView;
 		View pendingView;
+		//int previousChapter = -1;
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		Typeface tf = Typefaces.get(mContext, "fonts/exo200.ttf");
 		
-		if (position == getCount()-1 && isLoading.get()) {
+		/*
+		if (position <= getCount() - 1)
+			previousChapter = getItem(position).getNumChapter() - 1;
+		*/
+		
+		if (position == (getCount() - 1) && isLoading.get()) {
 			pendingView = inflater.inflate(R.layout.pending_verse_row, null);
 			// Carrega mais versiculos
-			new LoadMore().execute();
+			new LoadMore(numBookID, ++currentChapNum).execute();
 			return pendingView;
 		}
+		/*
+		else if (position == 0 && isLoading.get() && previousChapter >= 1) {
+			pendingView = inflater.inflate(R.layout.pending_verse_row, null);
+			// Carrega mais versiculos
+			new LoadMore(numBookID, previousChapter).execute();
+			return pendingView;
+		}
+		*/
 		else {
 			int resourceID;
 			// Se o versiculo estiver vazio
@@ -199,6 +215,14 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 	// Inner class para execução em background
 	public class LoadMore extends AsyncTask<Void, Integer, Exception> {
 		ProgressDialog mDialog;
+		private Integer bookID;
+		private Integer chapNum;
+		
+		public LoadMore(Integer bID, Integer cNum) {
+			//if (cNum != null && cNum > 0)
+				bookID = bID;
+				chapNum = cNum;
+		}
 		
 		@Override
 		protected void onPreExecute() {
@@ -210,10 +234,11 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		protected Exception doInBackground(Void... params) {
 			Cursor cursor;
 			
-			cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ", new String[] {numBookID.toString(), (++currentChapNum).toString()});
+			cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ",
+					new String[] {bookID.toString(),chapNum.toString()} );
 			if (cursor.moveToFirst()) {
 				// Adiciona o "stub" de versículo (apenas o número do capítulo)
-				mVerseArrList.add(new BibleVerse(currentChapNum, -1, ""));
+				mVerseArrList.add(new BibleVerse(chapNum, -1, ""));
 				// Adiciona efetivamente os versículos
 				while (!cursor.isAfterLast()) {
 					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));

@@ -41,7 +41,8 @@
             android:src="@drawable/ribbon"
             android:background="@null"
             android:isScrollContainer="true"
-            android:contentDescription="@string/strRibbon"/>
+            android:contentDescription="@string/strRibbon"
+            android:adjustViewBounds="true"/>
 
     </LinearLayout>
 </FrameLayout>
