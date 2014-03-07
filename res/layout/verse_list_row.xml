@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -7,26 +6,26 @@
     android:paddingRight="5dip" >
 
     <TextView
-        android:id="@+id/lblVerseNum"
+        android:id="@+id/lblVerseListRowVerseNum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="right"
         android:minWidth="24dp"
         android:paddingRight="2dip"
         android:text="@string/lblSampleNum"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textAppearance="?android:attr/textAppearanceMedium"
         android:textStyle="bold"
         android:textColor="@android:color/black" 
         />
 
     <TextView
-        android:id="@+id/lblVerseTextView"
+        android:id="@+id/lblVerseListRowVerseDesc"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:text="@string/lblSampleText"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="normal"
+        android:textStyle="bold"
         android:textColor="@android:color/black" 
         android:paddingLeft="2dip"/>
 </LinearLayout>
