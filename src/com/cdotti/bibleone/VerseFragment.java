@@ -2,9 +2,12 @@ package com.cdotti.bibleone;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -18,9 +21,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
-public class VerseFragment extends Fragment implements OnItemClickListener, OnTouchListener {
+public class VerseFragment extends Fragment implements OnItemClickListener {
 	private ImageView imgRibbon;
-	private TextView textView;
 	private ListView listVerse;
 	private Integer bookID;
 	private Integer chapterNum;
@@ -56,63 +58,63 @@ public class VerseFragment extends Fragment implements OnItemClickListener, OnTo
 		bookID = extras.getInt("bookID");
 		chapterNum = extras.getInt("chapterNum");
 		
-		//this.setTitle(bookName);
-		
-		textView = (TextView) view.findViewById(R.id.lblVerseListHeaderText);
-		textView.setText(getResources().getString(R.string.chapterLabel) + " " + chapterNum.toString());
+		BibleVerseAdapter verseAdapter = new BibleVerseAdapter(getActivity().getApplicationContext(), bookID, chapterNum);
 		
 		listVerse = (ListView) view.findViewById(R.id.listVerse);
-		listVerse.setAdapter(new BibleVerseAdapter(getActivity().getApplicationContext(), bookID, chapterNum));
+		listVerse.setAdapter(verseAdapter);
 		listVerse.setOnItemClickListener(this);
 
 		imgRibbon = (ImageView) view.findViewById(R.id.imgRibbon);
-		imgRibbon.setOnTouchListener(this);
+		imgRibbon.setOnTouchListener(new MyDragClassListener());
 		
 		return view;
 	}
 	
 	@Override
 	public void onItemClick(AdapterView<?> parentView, View view, int arg2, long arg3) {
-		TextView txtNumView = (TextView) view.findViewById(R.id.lblVerseNum);
+		TextView txtNumView = (TextView) view.findViewById(R.id.lblVerseListRowVerseNum);
+		Integer nVerseNum = null;
 		
-		//if (txtNumView != null)
-		//	Toast.makeText(getActivity().getApplicationContext(), txtNumView.getText(), Toast.LENGTH_SHORT).show();
-		
-		mOnSelectedVerseCallback.onSelectedVerse(Integer.valueOf((String) txtNumView.getText()));
+		if (txtNumView != null) {
+			nVerseNum = Integer.valueOf((String) txtNumView.getText());
+			mOnSelectedVerseCallback.onSelectedVerse(nVerseNum);
+		}
 	}
 
-	float downX, downY;
-	int totalX, totalY;
-	int scrollByX, scrollByY;
-	
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		
-		float currentX, currentY;
-		
-		switch (event.getAction()) {
-		
-		case MotionEvent.ACTION_DOWN:
-			downX = event.getX();
-			downY = event.getY();
-			break;
+	private static class MyDragClassListener implements OnTouchListener {
 
-		case MotionEvent.ACTION_MOVE:
-			currentX = event.getX();
-			currentY = event.getY();
-			scrollByX = (int) (downX - currentX);
-			scrollByY = (int) (downY + currentY);
+		private Matrix matrix = new Matrix();
+		
+		private PointF start = new PointF();
+		private PointF lastPosition = new PointF();
+		
+		private int mActivePointer = MotionEvent.INVALID_POINTER_ID;
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
 			
-			((ImageView) v).setMinimumHeight(scrollByY);
-			v.invalidate();
+			ImageView img = (ImageView) v;
 			
-			//Toast.makeText(getActivity().getApplicationContext(), "Moveu", Toast.LENGTH_SHORT).show();
-			break;
+			switch (event.getAction() & MotionEvent.ACTION_MASK) {
 			
-		default:
-			break;
+				case MotionEvent.ACTION_DOWN:
+					start.x = event.getX();
+					start.y = event.getY();
+					lastPosition.set(start);
+					break;
+				case MotionEvent.ACTION_MOVE:
+					matrix.postTranslate(0, event.getY() - lastPosition.y);
+					lastPosition.set(event.getX(), event.getY());
+					break;
+					
+				default:
+					break;
+			}
+			img.setImageMatrix(matrix);
+			
+			return true;
 		}
 		
-		return true;
 	}
+	
 }

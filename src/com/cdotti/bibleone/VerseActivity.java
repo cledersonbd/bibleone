@@ -100,9 +100,9 @@ public class VerseActivity extends BaseActivity
 	
 	@Override
 	public void onItemClick(AdapterView<?> parentView, View view, int arg2, long arg3) {
-		TextView txtNumView = (TextView) view.findViewById(R.id.lblVerseNum);
+		TextView txtNumView = (TextView) view.findViewById(R.id.lblVerseListRowVerseNum);
 		
-		if (txtNumView != null)
+		if (txtNumView != null && txtNumView.getText() != null)
 			Toast.makeText(getApplicationContext(), txtNumView.getText(), Toast.LENGTH_SHORT).show();
 	}
 

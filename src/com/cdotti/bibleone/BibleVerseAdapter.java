@@ -52,6 +52,8 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ", new String[] {numBookID.toString(), numChapterID.toString()});
 		try {
 			if (cursor.moveToFirst()) {
+				// Adiciona o "stub" de versículo (apenas o número do capítulo)
+				mVerseArrList.add(new BibleVerse(numChapterID, -1, ""));
 				while (!cursor.isAfterLast()) {
 					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));					
 					cursor.moveToNext();
@@ -62,6 +64,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		}
 		
 	}
+	
 	// Construtor quando se passa os versículos já prontos
 	public BibleVerseAdapter(Context c, ArrayList<BibleVerse> aVerseList) {		
 		if (mContext == null)
@@ -69,6 +72,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		
 		mVerseArrList = aVerseList;
 	}
+	
 	/**
 	 * Função utilizada para construir as seções (capítulos) da listView
 	 */
@@ -78,7 +82,6 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 			Integer chave = (Integer) i / DIV_PAGE;
 			if (!indexer.containsKey(chave))
 				indexer.put(chave, item);
-			
 		}
 		
 		ArrayList<Integer> sectionList = new ArrayList<Integer>(indexer.keySet());
@@ -124,12 +127,18 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 
 	@Override
 	public BibleVerse getItem(int position) {
-		return mVerseArrList.get(position);
+		BibleVerse oItem = null;
+		if (position < mVerseArrList.size())
+			oItem = mVerseArrList.get(position); 
+		return oItem;
 	}
 
 	@Override
 	public long getItemId(int position) {
-		return mVerseArrList.get(position).getId();
+		Integer id = null;
+		if (position < mVerseArrList.size())
+			id = mVerseArrList.get(position).getId();
+		return id;
 	}	
 	
 	@Override
@@ -147,7 +156,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		*/
 		
 		if (position == (getCount() - 1) && isLoading.get()) {
-			pendingView = inflater.inflate(R.layout.pending_verse_row, null);
+			pendingView = inflater.inflate(R.layout.verse_list_pending_row, null);
 			// Carrega mais versiculos
 			new LoadMore(numBookID, ++currentChapNum).execute();
 			return pendingView;
@@ -163,10 +172,15 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		else {
 			int resourceID;
 			// Se o versiculo estiver vazio
-			if (mVerseArrList.get(position).getText().isEmpty()) {
-				resourceID = R.layout.verse_list_header_row;
-				if (convertView != null && convertView.findViewById(R.id.lblVerseListHeaderText) == null)
-						convertView = null;
+			if (getItem(position).getText().isEmpty()) {
+				resourceID = R.layout.verse_list_header;
+				if (convertView != null && convertView.findViewById(R.id.lblVerseListHeaderChapterNum) == null)
+					convertView = null;
+				
+				// Se o proximo item da lista nao for um item
+				if ((position + 1) <= mVerseArrList.size() && !(mVerseArrList.get(position + 1).getText().isEmpty()) ) {
+					
+				}
 			}
 			else
 				resourceID = R.layout.verse_list_row;
@@ -178,9 +192,9 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 				customView = convertView;
 			}			
 				
-			TextView verseNum = (TextView) customView.findViewById(R.id.lblVerseNum);
-			TextView verseText = (TextView) customView.findViewById(R.id.lblVerseTextView);
-			TextView verseChapterText = (TextView) customView.findViewById(R.id.lblVerseListHeaderText);
+			TextView verseNum = (TextView) customView.findViewById(R.id.lblVerseListRowVerseNum);
+			TextView verseText = (TextView) customView.findViewById(R.id.lblVerseListRowVerseDesc);
+			TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
 			
 			if (verseNum != null) {
 				verseNum.setText(mVerseArrList.get(position).getId().toString());
@@ -190,10 +204,9 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 				verseText.setText(mVerseArrList.get(position).getText());
 				verseText.setTypeface(tf);
 			}
-			if (verseChapterText != null) {
-				verseChapterText.setText(mContext.getResources().getString(R.string.chapterLabel) + " " +
-						mVerseArrList.get(position).getNumChapter().toString());
-				verseChapterText.setTextColor(Color.BLACK);
+			if (verseChapterNumber != null) {
+				verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
+				verseChapterNumber.setTextColor(Color.BLACK);
 			}
 		}
 					
