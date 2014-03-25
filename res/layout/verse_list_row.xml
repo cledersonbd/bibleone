@@ -1,31 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewFlipper
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/viewFlipperVerseRow"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:paddingLeft="2dip"
-    android:paddingRight="5dip" >
+    android:layout_height="wrap_content" 
+    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+    android:layout_marginRight="@dimen/activity_horizontal_margin">
+      
+	<LinearLayout
+	    android:id="@+id/viewVerseMain"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:baselineAligned="false"
+	    android:orientation="horizontal" >
+	
+	  <TextView
+	      android:id="@+id/lblVerseListRowVerseNum"
+	      android:layout_width="wrap_content"
+	      android:layout_height="wrap_content"
+	      android:gravity="right"
+	      android:minWidth="24dp"
+	      android:text="@string/lblSampleNum"
+	      android:textAppearance="?android:attr/textAppearanceMedium"
+	      android:textStyle="bold"
+	      android:textColor="@android:color/black" 
+	      />
 
-    <TextView
-        android:id="@+id/lblVerseListRowVerseNum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        android:minWidth="24dp"
-        android:paddingRight="2dip"
-        android:text="@string/lblSampleNum"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" 
-        />
+	  <TextView
+	      android:id="@+id/lblVerseListRowVerseDesc"
+	      android:layout_width="wrap_content"
+	      android:layout_height="wrap_content"
+	      android:text="@string/lblSampleText"
+	      android:textAppearance="?android:attr/textAppearanceSmall"
+	      android:textColor="@android:color/black"
+	      android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/lblVerseListRowVerseDesc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:text="@string/lblSampleText"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" 
-        android:paddingLeft="2dip"/>
-</LinearLayout>
+	  </LinearLayout>
+	
+	<LinearLayout 
+	      android:id="@+id/viewVerseOptions"
+	      android:layout_height="match_parent"
+	      android:layout_width="match_parent"
+	      android:orientation="horizontal"
+	      android:gravity="center_vertical|right"
+	      android:padding="@dimen/activity_horizontal_margin">
+	              
+		<Button android:id="@+id/btnOptFav"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@null" 
+			android:text="@string/btnSaveFavorite"/>
+		
+		<Button android:id="@+id/btnOptMarkRead"
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:background="@null" 
+			android:text="@string/btnMarkRead"/>
+	</LinearLayout>
+</ViewFlipper>

@@ -1,31 +1,26 @@
 package com.cdotti.bibleone;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.graphics.Matrix;
-import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.MotionEventCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 public class VerseFragment extends Fragment implements OnItemClickListener {
-	private ImageView imgRibbon;
-	private ListView listVerse;
+	private StickyListHeadersListView listVerse;
 	private Integer bookID;
 	private Integer chapterNum;
+	
+	private static final String CLASS_TAG = "VerseFragment";
 	
 	OnSelectedVerseListener mOnSelectedVerseCallback;
 
@@ -60,12 +55,10 @@ public class VerseFragment extends Fragment implements OnItemClickListener {
 		
 		BibleVerseAdapter verseAdapter = new BibleVerseAdapter(getActivity().getApplicationContext(), bookID, chapterNum);
 		
-		listVerse = (ListView) view.findViewById(R.id.listVerse);
+		listVerse = (StickyListHeadersListView) view.findViewById(R.id.listVerse);
 		listVerse.setAdapter(verseAdapter);
 		listVerse.setOnItemClickListener(this);
-
-		imgRibbon = (ImageView) view.findViewById(R.id.imgRibbon);
-		imgRibbon.setOnTouchListener(new MyDragClassListener());
+		listVerse.getWrappedList().setOnTouchListener(new VerseListGestureListener(getActivity().getApplicationContext(), listVerse.getWrappedList()));
 		
 		return view;
 	}
@@ -79,42 +72,6 @@ public class VerseFragment extends Fragment implements OnItemClickListener {
 			nVerseNum = Integer.valueOf((String) txtNumView.getText());
 			mOnSelectedVerseCallback.onSelectedVerse(nVerseNum);
 		}
-	}
-
-	private static class MyDragClassListener implements OnTouchListener {
-
-		private Matrix matrix = new Matrix();
-		
-		private PointF start = new PointF();
-		private PointF lastPosition = new PointF();
-		
-		private int mActivePointer = MotionEvent.INVALID_POINTER_ID;
-		
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			
-			ImageView img = (ImageView) v;
-			
-			switch (event.getAction() & MotionEvent.ACTION_MASK) {
-			
-				case MotionEvent.ACTION_DOWN:
-					start.x = event.getX();
-					start.y = event.getY();
-					lastPosition.set(start);
-					break;
-				case MotionEvent.ACTION_MOVE:
-					matrix.postTranslate(0, event.getY() - lastPosition.y);
-					lastPosition.set(event.getX(), event.getY());
-					break;
-					
-				default:
-					break;
-			}
-			img.setImageMatrix(matrix);
-			
-			return true;
-		}
-		
 	}
 	
 }

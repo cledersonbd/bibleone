@@ -5,33 +5,44 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import android.app.ProgressDialog;
+import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, StickyListHeadersAdapter {
 	private Context mContext;
 	private ArrayList<BibleVerse> mVerseArrList;
 	private BibleDBHelper bibleDBHelper;
 	private SQLiteDatabase bibleDB;
 	private HashMap<Integer, Integer> indexer;
 	private Integer[] sections;
-	private static final Integer DIV_PAGE = 3;
 	private AtomicBoolean isLoading = new AtomicBoolean(true);
 	private Integer currentChapNum;
 	private Integer numBookID;
 	private Integer numChapterID;
+	
+	private static final Integer DIV_PAGE = 3;
+	private static final int PENDING_VIEW_TYPE = 0;
+	private static final int HEADER_VIEW_TYPE = 1;
+	private static final int ITEM_VIEW_TYPE = 1;
+	
+	private static final int NUM_TOTAL_VIEWS = 2;
+	
+	private OnTouchListener mTouchListenerFallBack;
 	
 	// Construtor quando se passam os IDs do livro e capítulo
 	public BibleVerseAdapter(Context c, Integer nBookID, Integer nChapterID) {		
@@ -53,7 +64,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		try {
 			if (cursor.moveToFirst()) {
 				// Adiciona o "stub" de versículo (apenas o número do capítulo)
-				mVerseArrList.add(new BibleVerse(numChapterID, -1, ""));
+				//mVerseArrList.add(new BibleVerse(numChapterID, -1, ""));
 				while (!cursor.isAfterLast()) {
 					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));					
 					cursor.moveToNext();
@@ -102,19 +113,24 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 	
 	@Override
 	public int getItemViewType(int position) {
-
+		int nViewType = IGNORE_ITEM_VIEW_TYPE;
+		
 		// Se a posicao for maior que o tamanho do array (pendingView)
-		// ou se o versiculo estiver vazio (View do capitulo)
-		if (position >= mVerseArrList.size() || 
-				mVerseArrList.get(position).getText().isEmpty())
-			return IGNORE_ITEM_VIEW_TYPE;
+		if (position >= mVerseArrList.size())
+			nViewType = PENDING_VIEW_TYPE;
+		// Se for um cabecalho
+		else if (mVerseArrList.get(position).isHeader())
+			nViewType = HEADER_VIEW_TYPE;
+		// Senao so pode ser um versiculo
+		else
+			nViewType = ITEM_VIEW_TYPE;
 
-		return super.getItemViewType(position);
+		return nViewType;
 	}
 	
 	@Override
 	public int getViewTypeCount() {
-		return super.getViewTypeCount() + 2;
+		return NUM_TOTAL_VIEWS;
 	}
 	
 	@Override
@@ -150,68 +166,89 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		Typeface tf = Typefaces.get(mContext, "fonts/exo200.ttf");
 		
-		/*
-		if (position <= getCount() - 1)
-			previousChapter = getItem(position).getNumChapter() - 1;
-		*/
-		
+		// Se estiver na última posição e deve carregar, executa carga e retorna pendingView
 		if (position == (getCount() - 1) && isLoading.get()) {
 			pendingView = inflater.inflate(R.layout.verse_list_pending_row, null);
 			// Carrega mais versiculos
 			new LoadMore(numBookID, ++currentChapNum).execute();
 			return pendingView;
 		}
-		/*
-		else if (position == 0 && isLoading.get() && previousChapter >= 1) {
-			pendingView = inflater.inflate(R.layout.pending_verse_row, null);
-			// Carrega mais versiculos
-			new LoadMore(numBookID, previousChapter).execute();
-			return pendingView;
-		}
-		*/
 		else {
-			int resourceID;
-			// Se o versiculo estiver vazio
-			if (getItem(position).getText().isEmpty()) {
-				resourceID = R.layout.verse_list_header;
-				if (convertView != null && convertView.findViewById(R.id.lblVerseListHeaderChapterNum) == null)
-					convertView = null;
+			/*
+			// TRATAMENTO DE CABECALHOS DE CAPITULOS
+			// Se for um header
+			if (getItem(position).isHeader()) {
 				
-				// Se o proximo item da lista nao for um item
-				if ((position + 1) <= mVerseArrList.size() && !(mVerseArrList.get(position + 1).getText().isEmpty()) ) {
-					
+				// if it's not recycled, initialize some attributes
+				if (convertView == null)
+					customView = inflater.inflate(R.layout.verse_list_header, null);
+				else
+					customView = convertView;
+				
+				TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
+				
+				if (verseChapterNumber != null) {
+					verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
 				}
 			}
-			else
-				resourceID = R.layout.verse_list_row;
-			
-			// if it's not recycled, initialize some attributes
-			if (convertView == null) {
-				customView = inflater.inflate(resourceID, null);
-			} else {
-				customView = convertView;
-			}			
+			// Versiculo comum
+			else {
+			*/
 				
-			TextView verseNum = (TextView) customView.findViewById(R.id.lblVerseListRowVerseNum);
-			TextView verseText = (TextView) customView.findViewById(R.id.lblVerseListRowVerseDesc);
-			TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
-			
-			if (verseNum != null) {
-				verseNum.setText(mVerseArrList.get(position).getId().toString());
-				verseNum.setTypeface(tf);
-			}
-			if (verseText != null) {
-				verseText.setText(mVerseArrList.get(position).getText());
-				verseText.setTypeface(tf);
-			}
-			if (verseChapterNumber != null) {
-				verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
-				verseChapterNumber.setTextColor(Color.BLACK);
-			}
-		}
+				// if it's not recycled, initialize some attributes
+				if (convertView == null)
+					customView = inflater.inflate(R.layout.verse_list_row, null);
+				else
+					customView = convertView;
 					
+				TextView verseNum = (TextView) customView.findViewById(R.id.lblVerseListRowVerseNum);
+				TextView verseText = (TextView) customView.findViewById(R.id.lblVerseListRowVerseDesc);
+				
+				if (verseNum != null) {
+					verseNum.setText(mVerseArrList.get(position).getId().toString());
+					verseNum.setTypeface(tf);
+				}
+				if (verseText != null) {
+					verseText.setText(mVerseArrList.get(position).getText());
+					verseText.setTypeface(tf);
+//				}	
+			}
+			
+		}					
 		return customView;
 	}
+	
+	@Override
+	public View getHeaderView(int position, View convertView, ViewGroup parent) {
+		View customView;
+		
+		if (convertView == null) {
+			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			customView = inflater.inflate(R.layout.verse_list_header, null);
+		} else
+			customView = convertView;
+		
+		TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
+		
+		if (verseChapterNumber != null) {
+			verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
+		}
+		
+		return customView;
+	}
+
+	@Override
+	public long getHeaderId(int position) {
+		int numChap;
+		
+		if (position >= mVerseArrList.size())
+			numChap = mVerseArrList.get(position - 1).getNumChapter();
+		else	
+			numChap = mVerseArrList.get(position).getNumChapter();
+		
+		return numChap;
+	}
+	
 	@Override
 	public int getPositionForSection(int sectionIndexer) {
 		return indexer.get(sections[sectionIndexer]);
@@ -225,9 +262,16 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 		return sections;
 	}
 	
+	public boolean setOnTouchReceiver(OnTouchListener touchListener) {
+		if (mTouchListenerFallBack == null) {
+			mTouchListenerFallBack = touchListener;
+			return true;
+		}
+		return false;
+	}
+	
 	// Inner class para execução em background
-	public class LoadMore extends AsyncTask<Void, Integer, Exception> {
-		ProgressDialog mDialog;
+	private class LoadMore extends AsyncTask<Void, Integer, Exception> {
 		private Integer bookID;
 		private Integer chapNum;
 		
@@ -251,7 +295,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer {
 					new String[] {bookID.toString(),chapNum.toString()} );
 			if (cursor.moveToFirst()) {
 				// Adiciona o "stub" de versículo (apenas o número do capítulo)
-				mVerseArrList.add(new BibleVerse(chapNum, -1, ""));
+				//mVerseArrList.add(new BibleVerse(chapNum, -1, ""));
 				// Adiciona efetivamente os versículos
 				while (!cursor.isAfterLast()) {
 					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));

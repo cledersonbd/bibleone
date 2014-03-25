@@ -7,7 +7,7 @@
     <string name="txtNewTestment">New Testment</string>
     <string name="title_activity_book">BibleOne</string>
     <string name="txtBookName">Book</string>
-    <string name="chapterLabel">Chapter </string>
+    <string name="chapterLabel">Chapter\ </string>
     <string name="lblSampleNum">1</string>
     <string name="lblSampleText">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.orem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in est leo. Nulla quis sollicitudin augue. Cras adipiscing quam nulla, a laoreet lorem gravida id. Proin sed faucibus nunc. Quisque id metus eleifend felis dictum vestibulum. Praesent feugiat velit a dui tempus elementum.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec in felis vel quam viverra porta et sit amet felis. Phasellus scelerisque varius velit in iaculis. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</string>
     <string name="title_activity_verse">VerseActivity</string>
@@ -20,6 +20,11 @@
     <string name="lblVersionNumber">X.X.X</string>
     <string name="drawer_open">Drawer open</string>
     <string name="drawer_close">Drawer closed</string>
+    
+	<!-- Tela de versiculos -->
+	<string name="btnSaveFavorite">Salvar favorito</string>
+	<string name="btnMarkRead">Marcar leitura</string>
+	
     <string-array name="drawerArray">
         <item >Test</item>
         <item >About</item>

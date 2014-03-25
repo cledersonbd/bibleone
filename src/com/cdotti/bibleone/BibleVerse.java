@@ -43,6 +43,10 @@ public class BibleVerse implements Parcelable{
 		this.text = text;
 	}
 	
+	public boolean isHeader() {
+		return getId() < 0 && getNumChapter() > 0;
+	}
+	
 	/** * * Called from the constructor to create this 
 	 * * object from a parcel. 
 	 * * 
