@@ -1,5 +1,6 @@
 package com.cdotti.bibleone;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import android.content.Context;
 import android.view.GestureDetector;
 import android.view.GestureDetector.SimpleOnGestureListener;
@@ -16,14 +17,16 @@ public class VerseListGestureListener implements OnTouchListener {
     private Context mContext;
     private ListView mListView;
     
-    public VerseListGestureListener(Context context, ListView list) {
+    public VerseListGestureListener(Context context) {
     	mContext = context;
     	gestureDetector = new GestureDetector(mContext, new GestureListener());
-    	mListView = list;
     }
 
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {    		
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+    	if (view instanceof StickyListHeadersListView && mListView == null)
+    		mListView = (ListView) ((StickyListHeadersListView) view).getWrappedList();
+    	
         return gestureDetector.onTouchEvent(motionEvent);
     }
 
@@ -56,9 +59,9 @@ public class VerseListGestureListener implements OnTouchListener {
                 // Verifica somente o scroll horizontal
                 if (Math.abs(diffX) > SWIPE_THRESHOLD) {
                     if (diffX > 0) {
-                        onSwipeRight(e1.getX(), e1.getY());
+                        result = onSwipeRight(e1.getX(), e1.getY());
                     } else {
-                        onSwipeLeft(e1.getX(), e1.getY());
+                        result = onSwipeLeft(e1.getX(), e1.getY());
                     }
                 } else if (Math.abs(diffY) > SWIPE_THRESHOLD) {
                         if (diffY > 0) {
@@ -78,7 +81,8 @@ public class VerseListGestureListener implements OnTouchListener {
     public void onSwipeRight() {
     	Toast.makeText(mContext, "SwipeRight", Toast.LENGTH_SHORT).show();
     }
-    public void onSwipeRight(float x, float y) {
+    public boolean onSwipeRight(float x, float y) {
+    	boolean consumed = false;
     	int firstPositionVisible = mListView.getFirstVisiblePosition();
     	int positionDetected = mListView.pointToPosition((int)x, (int)y);
     	View v = mListView.getChildAt(positionDetected - firstPositionVisible);
@@ -91,12 +95,16 @@ public class VerseListGestureListener implements OnTouchListener {
     			
     			viewFlipper.showPrevious();
     		}
+    		// Evento consumido, evita a propagacao
+    		consumed = true;
     	}
+    	return consumed;
     }
     public void onSwipeLeft() {
     	Toast.makeText(mContext, "SwipeLeft", Toast.LENGTH_SHORT).show();
     }
-    public void onSwipeLeft(float x, float y) {
+    public boolean onSwipeLeft(float x, float y) {
+    	boolean consumed = false;
     	int firstPositionVisible = mListView.getFirstVisiblePosition();
     	int positionDetected = mListView.pointToPosition((int)x, (int)y);
     	View v = mListView.getChildAt(positionDetected - firstPositionVisible);
@@ -109,7 +117,10 @@ public class VerseListGestureListener implements OnTouchListener {
     			
     			viewFlipper.showNext();
     		}
+    		// Evento consumido, evita a propagacao
+    		consumed = true;
     	}
+    	return consumed;
     }
     public void onSwipeBottom(float x, float y) {
     	int firstPositionVisible = mListView.getFirstVisiblePosition();

@@ -2,28 +2,29 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:paddingRight="5dip" 
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingRight="7dp" >
 
     <TextView
         android:id="@+id/lblChapterNum"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:minWidth="40dip"
-        android:layout_weight="2"
+        android:layout_height="wrap_content"
+        android:gravity="right|top"
+        android:minWidth="@dimen/min_textbox_width_for_number_values"
+		android:minHeight="@dimen/min_textbox_height_for_number_values"
         android:text="@string/lblSampleNum"
-        android:textAppearance="?android:attr/textAppearanceLarge" 
+        android:textSize="@dimen/text_size_for_number_values" 
         />
 
     <TextView
         android:id="@+id/lblChapterTextView"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:maxLines="2"
-        android:layout_weight="4"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_vertical"
+        android:height="40dp"
         android:text="@string/lblSampleText"
         android:textAppearance="?android:attr/textAppearanceSmall" 
-        android:gravity="center_vertical"/>
+        android:maxLines="2"/>
 
 </LinearLayout>

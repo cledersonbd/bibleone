@@ -58,7 +58,7 @@ public class VerseFragment extends Fragment implements OnItemClickListener {
 		listVerse = (StickyListHeadersListView) view.findViewById(R.id.listVerse);
 		listVerse.setAdapter(verseAdapter);
 		listVerse.setOnItemClickListener(this);
-		listVerse.getWrappedList().setOnTouchListener(new VerseListGestureListener(getActivity().getApplicationContext(), listVerse.getWrappedList()));
+		listVerse.setOnTouchListener(new VerseListGestureListener(getActivity().getApplicationContext()));
 		
 		return view;
 	}
