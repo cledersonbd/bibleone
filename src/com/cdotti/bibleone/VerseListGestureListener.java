@@ -1,5 +1,7 @@
 package com.cdotti.bibleone;
 
+import java.util.ArrayList;
+
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 import android.content.Context;
 import android.view.GestureDetector;
@@ -16,10 +18,12 @@ public class VerseListGestureListener implements OnTouchListener {
     private final GestureDetector gestureDetector;
     private Context mContext;
     private ListView mListView;
+    private ArrayList<ViewFlipper> mUsedIndexes;
     
     public VerseListGestureListener(Context context) {
     	mContext = context;
     	gestureDetector = new GestureDetector(mContext, new GestureListener());
+    	mUsedIndexes = new ArrayList<ViewFlipper>();
     }
 
     @Override
@@ -31,8 +35,9 @@ public class VerseListGestureListener implements OnTouchListener {
     }
 
     private final class GestureListener extends SimpleOnGestureListener {
-
+    	
         private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_THRESHOLD_Y = 50;
 
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
@@ -46,8 +51,10 @@ public class VerseListGestureListener implements OnTouchListener {
         			viewFlipper.setInAnimation(mContext, R.anim.activity_slide_in_from_right);
         			viewFlipper.setOutAnimation(mContext, R.anim.activity_slide_out_to_left);
         			viewFlipper.showNext();
+        			mUsedIndexes.add(viewFlipper);
         		}        			
         	}
+        	
         	return true;
         }
         @Override
@@ -63,13 +70,15 @@ public class VerseListGestureListener implements OnTouchListener {
                     } else {
                         result = onSwipeLeft(e1.getX(), e1.getY());
                     }
-                } else if (Math.abs(diffY) > SWIPE_THRESHOLD) {
+                } else if (Math.abs(diffY) > SWIPE_THRESHOLD_Y) {
                         if (diffY > 0) {
                             //onSwipeBottom(e1.getX(), e1.getY());
                         } else {
                             //onSwipeTop(e1.getX(), e1.getY());
                         	//onSwipeTop(distanceX, distanceY);
                         }
+                        
+                        resetFlipper();
                     }
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -94,10 +103,12 @@ public class VerseListGestureListener implements OnTouchListener {
     			viewFlipper.setOutAnimation(mContext, R.anim.activity_slide_out_to_right);
     			
     			viewFlipper.showPrevious();
+    			mUsedIndexes.remove(viewFlipper);
     		}
     		// Evento consumido, evita a propagacao
     		consumed = true;
     	}
+
     	return consumed;
     }
     public void onSwipeLeft() {
@@ -116,10 +127,12 @@ public class VerseListGestureListener implements OnTouchListener {
     			viewFlipper.setOutAnimation(mContext, R.anim.activity_slide_out_to_left);
     			
     			viewFlipper.showNext();
+    			mUsedIndexes.add(viewFlipper);
     		}
     		// Evento consumido, evita a propagacao
     		consumed = true;
     	}
+
     	return consumed;
     }
     public void onSwipeBottom(float x, float y) {
@@ -135,5 +148,16 @@ public class VerseListGestureListener implements OnTouchListener {
     		mListView.getChildAt(i).scrollBy(0, (int) y);
     		mListView.getChildAt(i).invalidate();
     	}
+    }
+    
+    private void resetFlipper() {
+    	ViewFlipper vf;    	
+    	for (int i = 0; i < mUsedIndexes.size(); i++) {
+    		vf = mUsedIndexes.get(i);
+    		vf.setInAnimation(mContext, R.anim.activity_slide_in_from_left);
+    		vf.setOutAnimation(mContext, R.anim.activity_slide_out_to_right);
+    		vf.setDisplayedChild(0);
+    	}
+    	mUsedIndexes.clear();
     }
 }

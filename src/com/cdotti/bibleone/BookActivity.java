@@ -20,11 +20,11 @@ public class BookActivity extends Activity implements OnItemClickListener {
         	
         // Binding utilizado nas paradas
         gridOldTest = (GridView) findViewById(R.id.gridOldTest);
-        gridOldTest.setAdapter(new BibleBookAdapter(getApplicationContext(), "1"));
+        gridOldTest.setAdapter(new BibleBookAdapter(getApplicationContext(), BibleBookDAO.OLD_TESTAMENT));
 
         // Binding utilizado nas paradas
         gridNewTest = (GridView) findViewById(R.id.gridNewTest);
-        gridNewTest.setAdapter(new BibleBookAdapter(getApplicationContext(), "2"));
+        gridNewTest.setAdapter(new BibleBookAdapter(getApplicationContext(), BibleBookDAO.NEW_TESTAMENT));
 		
 		// Configura o ItemClick function (nesta mesma classe)
 		gridOldTest.setOnItemClickListener(this);

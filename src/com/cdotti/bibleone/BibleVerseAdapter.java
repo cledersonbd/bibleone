@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -19,15 +17,15 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
+import android.widget.ViewFlipper;
 
 @TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, StickyListHeadersAdapter {
 	private Context mContext;
 	private ArrayList<BibleVerse> mVerseArrList;
-	private BibleDBHelper bibleDBHelper;
-	private SQLiteDatabase bibleDB;
 	private HashMap<Integer, Integer> indexer;
 	private Integer[] sections;
 	private AtomicBoolean isLoading = new AtomicBoolean(true);
@@ -44,10 +42,24 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 	
 	private OnTouchListener mTouchListenerFallBack;
 	
+	// Para os itens	
+	private static class ViewHolderHeader {
+		TextView chapterLabel;
+		TextView chapterNumber;
+	}
+		
+	// Para os itens	
+	protected static class ViewHolderItem {
+		ViewFlipper viewF;
+		TextView verseNum;
+		TextView verseText;
+		// Botoes de opcao
+		Button btnOptFav;
+		Button btnOptMarkRead;
+	}
+	
 	// Construtor quando se passam os IDs do livro e capítulo
 	public BibleVerseAdapter(Context c, Integer nBookID, Integer nChapterID) {		
-		Cursor cursor;
-		
 		if (mContext == null)
 			mContext = c;
 		
@@ -55,24 +67,9 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 		numChapterID = nChapterID;
 		currentChapNum = numChapterID;
 		
-		bibleDBHelper = new BibleDBHelper(mContext);
-		bibleDB = bibleDBHelper.openDatabase();
-		mVerseArrList = new ArrayList<BibleVerse>();
+		BibleVerseDAO verseDAO = new BibleVerseDAO(mContext);
+		mVerseArrList = verseDAO.getAllBookChapter(nBookID, nChapterID);
 		indexer = new HashMap<Integer, Integer>();
-		
-		cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ", new String[] {numBookID.toString(), numChapterID.toString()});
-		try {
-			if (cursor.moveToFirst()) {
-				// Adiciona o "stub" de versículo (apenas o número do capítulo)
-				//mVerseArrList.add(new BibleVerse(numChapterID, -1, ""));
-				while (!cursor.isAfterLast()) {
-					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));					
-					cursor.moveToNext();
-				}
-			}	
-		} finally {
-			cursor.close();
-		}
 		
 	}
 	
@@ -160,11 +157,11 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 	@Override
 	// create a new TextView for each item referenced by the Adapter
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View customView;
-		View pendingView;
-		//int previousChapter = -1;
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		Typeface tf = Typefaces.get(mContext, "fonts/exo200.ttf");
+		ViewHolderItem vHolder;
+		View pendingView;
+		Typeface tfRobotoThin;
+		Typeface tfRobotoThick;
 		
 		// Se estiver na última posição e deve carregar, executa carga e retorna pendingView
 		if (position == (getCount() - 1) && isLoading.get()) {
@@ -174,67 +171,63 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 			return pendingView;
 		}
 		else {
-			/*
-			// TRATAMENTO DE CABECALHOS DE CAPITULOS
-			// Se for um header
-			if (getItem(position).isHeader()) {
-				
-				// if it's not recycled, initialize some attributes
-				if (convertView == null)
-					customView = inflater.inflate(R.layout.verse_list_header, null);
-				else
-					customView = convertView;
-				
-				TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
-				
-				if (verseChapterNumber != null) {
-					verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
-				}
-			}
-			// Versiculo comum
-			else {
-			*/
-				
-				// if it's not recycled, initialize some attributes
-				if (convertView == null)
-					customView = inflater.inflate(R.layout.verse_list_row, null);
-				else
-					customView = convertView;
-					
-				TextView verseNum = (TextView) customView.findViewById(R.id.lblVerseListRowVerseNum);
-				TextView verseText = (TextView) customView.findViewById(R.id.lblVerseListRowVerseDesc);
-				
-				if (verseNum != null) {
-					verseNum.setText(mVerseArrList.get(position).getId().toString());
-					verseNum.setTypeface(tf);
-				}
-				if (verseText != null) {
-					verseText.setText(mVerseArrList.get(position).getText());
-					verseText.setTypeface(tf);
-//				}	
-			}
+			BibleVerse verse = mVerseArrList.get(position);
 			
-		}					
-		return customView;
+			// if it's not recycled, initialize some attributes
+			if (convertView == null) {
+				convertView = inflater.inflate(R.layout.verse_list_row, null);
+				tfRobotoThin = Typefaces.get(mContext, MainActivity.FONT_ROBOTO_100_PATH);
+				tfRobotoThick = Typefaces.get(mContext, MainActivity.FONT_MAIN_FONT);
+				
+				vHolder = new ViewHolderItem();
+				vHolder.viewF = (ViewFlipper) convertView.findViewById(R.id.viewFlipperVerseRow);
+				
+				vHolder.verseNum = (TextView) convertView.findViewById(R.id.lblVerseListRowVerseNum);
+				vHolder.verseNum.setTypeface(tfRobotoThick);
+				vHolder.verseText = (TextView) convertView.findViewById(R.id.lblVerseListRowVerseDesc);
+				vHolder.verseText.setTypeface(tfRobotoThin);
+				
+				vHolder.btnOptFav = (Button) convertView.findViewById(R.id.btnOptFav);
+				vHolder.btnOptFav.setOnClickListener(new OptButtonsListener(mContext));
+				
+				vHolder.btnOptMarkRead = (Button) convertView.findViewById(R.id.btnOptMarkRead);
+				
+				// guarda o viewHolder dentro da view
+				convertView.setTag(vHolder);
+			} else
+				vHolder = (ViewHolderItem) convertView.getTag();
+			
+			vHolder.verseNum.setText(verse.getId().toString());
+			vHolder.verseText.setText(verse.getText());
+			// Seta o objeto versiculo como tag do botao
+			vHolder.btnOptFav.setTag(verse);
+			vHolder.btnOptMarkRead.setTag(verse);	
+		}
+		
+		return convertView;
 	}
 	
 	@Override
 	public View getHeaderView(int position, View convertView, ViewGroup parent) {
-		View customView;
+		ViewHolderHeader vHolder;
 		
 		if (convertView == null) {
 			LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			customView = inflater.inflate(R.layout.verse_list_header, null);
-		} else
-			customView = convertView;
+			convertView = inflater.inflate(R.layout.verse_list_header, null);
+			vHolder = new ViewHolderHeader();
+			vHolder.chapterLabel = (TextView) convertView.findViewById(R.id.lblVerseListHeaderChapterLabel);
+			vHolder.chapterNumber = (TextView) convertView.findViewById(R.id.lblVerseListHeaderChapterNum);
+			
+			vHolder.chapterLabel.setTypeface(Typefaces.get(mContext, MainActivity.FONT_MAIN_FONT_TITLE));
+			vHolder.chapterNumber.setTypeface(Typefaces.get(mContext, MainActivity.FONT_MAIN_FONT));
+			
+			convertView.setTag(vHolder);
+		} else 
+			vHolder = (ViewHolderHeader) convertView.getTag();
 		
-		TextView verseChapterNumber = (TextView) customView.findViewById(R.id.lblVerseListHeaderChapterNum);
+		vHolder.chapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
 		
-		if (verseChapterNumber != null) {
-			verseChapterNumber.setText(mVerseArrList.get(position).getNumChapter().toString());
-		}
-		
-		return customView;
+		return convertView;
 	}
 
 	@Override
@@ -289,22 +282,17 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 
 		@Override
 		protected Exception doInBackground(Void... params) {
-			Cursor cursor;
+			ArrayList<BibleVerse> mNewVerseList;
 			
-			cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND chapter = ? ORDER BY book_id, chapter, verse ",
-					new String[] {bookID.toString(),chapNum.toString()} );
-			if (cursor.moveToFirst()) {
-				// Adiciona o "stub" de versículo (apenas o número do capítulo)
-				//mVerseArrList.add(new BibleVerse(chapNum, -1, ""));
-				// Adiciona efetivamente os versículos
-				while (!cursor.isAfterLast()) {
-					mVerseArrList.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));
-					cursor.moveToNext();
-				}
-			}
+			// Busca todos os versiculos do proximo capitulo
+			BibleVerseDAO verseDAO = new BibleVerseDAO(mContext);
+			mNewVerseList = verseDAO.getAllBookChapter(this.bookID, this.chapNum);
+			
+			if (mNewVerseList != null)
+				mVerseArrList.addAll(mNewVerseList);
 			else {
 				Log.e(BibleVerseAdapter.class.getName(), "None result was brought!");
-				return new Exception("Excecao");
+				return new Exception("None result was brought!");
 			}
 			
 			return null;

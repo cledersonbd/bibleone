@@ -16,8 +16,10 @@ import android.widget.Toast;
 
 public class VerseActivity extends BaseActivity 
 		implements OnItemClickListener, VerseFragment.OnSelectedVerseListener {
+	
 	private Integer bookID;
 	private Integer chapterNum;
+	private Integer verseNumToGo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,7 @@ public class VerseActivity extends BaseActivity
 		bookID = extras.getInt("bookID");
 		chapterNum = extras.getInt("chapterNum");
 		String bookName = extras.getString("titleName");
+		verseNumToGo = extras.getInt("verseNum");
 		
 		this.setTitle(bookName);
 		
@@ -39,6 +42,9 @@ public class VerseActivity extends BaseActivity
 		args.putInt("bookID", bookID);
 		args.putInt("chapterNum", chapterNum);
 		args.putString("titleName", bookName);
+		
+		if (verseNumToGo != 0)
+			args.putInt("verseNum", verseNumToGo);
 		
 		VerseFragment verseFragment;
 		verseFragment = new VerseFragment();

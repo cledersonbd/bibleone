@@ -59,6 +59,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.cdotti.bibleone.MainActivity" />
         </activity>
+        
+        <!-- Activity de favoritos -->
+        <activity
+            android:name="com.cdotti.bibleone.VerseFavActivity"
+            android:label="@string/title_activity_verse_fav"
+            android:parentActivityName="com.cdotti.bibleone.MainActivity" 
+            android:screenOrientation="portrait"
+            android:launchMode="singleTop">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.cdotti.bibleone.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

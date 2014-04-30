@@ -41,20 +41,21 @@ public class ChapterFragment extends Fragment implements OnItemClickListener {
 		
 		View view = inflater.inflate(R.layout.activity_chapter, container, false);
 		
-		Integer chapter_id = 1;
+		Integer nBookID = 1;
 		
 		Bundle extras = getArguments();
 		if (extras != null) {
-			chapter_id = extras.getInt("bookID");
+			nBookID = extras.getInt("bookID");
 			String bookName = extras.getString("bookName");
-			
+			/*
 			textView = (TextView) view.findViewById(R.id.lblBookName);
 			textView.setText(bookName);
+			*/
 		}
 		
 		// Binding utilizado nas paradas
 		listChapter = (ListView) view.findViewById(R.id.listBookVerse);
-		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), chapter_id.toString()));
+		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), nBookID));
 		listChapter.setOnItemClickListener(this);
 		return view;
 	}
@@ -71,7 +72,7 @@ public class ChapterFragment extends Fragment implements OnItemClickListener {
 	
 	public void updateContent(Integer bookID) {
 		
-		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), bookID.toString()));
+		listChapter.setAdapter(new BibleChapterAdapter(getActivity().getApplicationContext(), bookID));
 		listChapter.invalidate();
 	}
 }

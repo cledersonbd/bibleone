@@ -7,6 +7,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +29,11 @@ public class MainActivity extends BaseActivity
 						ChapterFragment.OnChapterSelectedListener {
 	
 	private Boolean isDualPane = false;
+	
+	public static final String FONT_EXO_PATH =  "fonts/exo200.ttf";
+	public static final String FONT_ROBOTO_100_PATH =  "fonts/roboto100.ttf";
+	public static final String FONT_MAIN_FONT_TITLE =  "fonts/roboto300.ttf";
+	public static final String FONT_MAIN_FONT =  "fonts/dosis_regular.ttf";
 	
 	private String[] mMenuList;
 	private ListView mDrawerList;
@@ -53,9 +59,11 @@ public class MainActivity extends BaseActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main_frag);
 		
+		PreferenceManager.setDefaultValues(getApplicationContext(), R.xml.preferences, false);
+		
 		// Se o layout de mainFrame esta existe == dual pane
 		isDualPane = findViewById(R.id.mainFrameLayout) != null;
-			
+		
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mMenuList = getResources().getStringArray(R.array.drawerArray);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -171,7 +179,7 @@ public class MainActivity extends BaseActivity
 	*/
 	
 	/**
-	 * Funcao para o meno lateral - DrawerMenu
+	 * Funcao para o menu lateral - DrawerMenu
 	 */
 	@TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
 	@Override
@@ -181,7 +189,32 @@ public class MainActivity extends BaseActivity
 		FragmentTransaction ft;
 		String aboutTag = "about";
 		
-		if (position == mMenuList.length - 1 && fm.findFragmentByTag(aboutTag) == null) {
+		/*
+		 * 0 Favoritos
+		 * 1 Configuracoes
+		 * 2 Sobre
+		 */
+		// Favoritos
+		if (position == 0) {
+			startActivity(new Intent(getApplicationContext(), VerseFavActivity.class));
+		}
+		// COnfiguracoes
+		else if (position == 1){
+			/*
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {				
+				ft = fm.beginTransaction();
+				ft.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
+						R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
+				ft.replace(R.id.content_frame, new SettingsFragment());
+				ft.commit();
+			}
+			*/
+			Intent it = new Intent(getApplicationContext(), SettingsActivity.class);
+			startActivity(it);
+				
+			
+		}
+		else if (position == 2 && fm.findFragmentByTag(aboutTag) == null) {
 			String versionName;
 			Fragment aboutfrag = new AboutFragment();
 			Bundle args = new Bundle();
@@ -205,9 +238,6 @@ public class MainActivity extends BaseActivity
 			// Fecha a gaveta
 			mDrawerLayout.closeDrawer(Gravity.START);
 			
-		}
-		else if (position == 0) {
-			startActivity(new Intent(getApplicationContext(), SettingsActivity.class));
 		}
 		
 	}

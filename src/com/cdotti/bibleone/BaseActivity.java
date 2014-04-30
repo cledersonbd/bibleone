@@ -18,7 +18,7 @@ public class BaseActivity extends FragmentActivity
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		
 		mSharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-		String prefColor = mSharedPrefs.getString(SettingsActivity.APP_COLOR_SCHEME, "");
+		String prefColor = mSharedPrefs.getString(SettingsActivity.KEY_APPCOLOR_SCHEME, "");
 		int meuResID = getResources().getIdentifier(prefColor, "style", getPackageName()); 
 		
 		setTheme(meuResID);
@@ -44,7 +44,7 @@ public class BaseActivity extends FragmentActivity
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences,
 			String key) {
 		
-		if (key.equals(SettingsActivity.APP_COLOR_SCHEME)) {
+		if (key.equals(SettingsActivity.KEY_APPCOLOR_SCHEME)) {
 			Toast.makeText(getApplicationContext(), "Atualizou o valor da cor", Toast.LENGTH_SHORT).show();
 		}
 		

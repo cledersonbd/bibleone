@@ -43,11 +43,11 @@ public class BookFragment extends Fragment implements OnItemClickListener {
 		
         // Binding utilizado nas paradas
         gridOldTest = (GridView) view.findViewById(R.id.gridOldTest);
-        gridOldTest.setAdapter(new BibleBookAdapter(getActivity().getApplicationContext(), "1"));
+        gridOldTest.setAdapter(new BibleBookAdapter(getActivity().getApplicationContext(), BibleBookDAO.OLD_TESTAMENT));
 
         // Binding utilizado nas paradas
         gridNewTest = (GridView) view.findViewById(R.id.gridNewTest);
-        gridNewTest.setAdapter(new BibleBookAdapter(getActivity().getApplicationContext(), "2"));
+        gridNewTest.setAdapter(new BibleBookAdapter(getActivity().getApplicationContext(), BibleBookDAO.NEW_TESTAMENT));
 		
 		// Configura o ItemClick function (nesta mesma classe)
 		gridOldTest.setOnItemClickListener(this);

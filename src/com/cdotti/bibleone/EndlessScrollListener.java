@@ -1,25 +1,12 @@
 package com.cdotti.bibleone;
 
-import android.content.Context;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
-import android.widget.ListAdapter;
 
 public class EndlessScrollListener implements OnScrollListener {
-	private Context mContext;
-	private ListAdapter mAdapter;
 	private int previousTotal = 0;
 	private int visibleThreshold = 0;
 	private boolean isLoading = true;
-	
-	public EndlessScrollListener(Context c) {
-		mContext = c;
-	}
-	
-	public EndlessScrollListener(Context c, ListAdapter b) {
-		mContext = c;
-		mAdapter = b;
-	}
 	
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem,

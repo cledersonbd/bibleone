@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.view.LayoutInflater;
@@ -19,50 +17,24 @@ import android.widget.TextView;
 public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 	private Context mContext;
 	private ArrayList<BibleChapter> mChapterArr;
-	private BibleDBHelper bibleDBHelper;
-	private SQLiteDatabase bibleDB;
 	private HashMap<Integer, Integer> indexer;
 	private Integer[] sections;
 	private static final Integer MAX_VERSES_PER_CHAPTER = 3;
 	private static final Integer DIV_PAGE = 10;
 	
-	public BibleChapterAdapter(Context c, String cBookId) {
-		Cursor cursor;
-		int id = -1;
-		Integer book_id = -1;
-		int chapter = 1;
-		ArrayList<BibleVerse> chapterVerse = new ArrayList<BibleVerse>();
-		
+	// Classe ViewHolder para manter as views a serem trabalhadas
+	private static class ViewHolder {
+		TextView chapterNum;
+		TextView chapterText;
+	}
+	
+	public BibleChapterAdapter(Context c, Integer nBookID) {
 		if (mContext == null)
 			mContext = c;
 		
-		bibleDBHelper = new BibleDBHelper(mContext);
-		bibleDB = bibleDBHelper.openDatabase();
-		mChapterArr = new ArrayList<BibleChapter>();
+		BibleVerseDAO verseDAO = new BibleVerseDAO(mContext);
+		mChapterArr = verseDAO.getChapter(nBookID, MAX_VERSES_PER_CHAPTER);
 		indexer = new HashMap<Integer, Integer>();
-		
-		cursor = bibleDB.rawQuery("SELECT id,book_id,chapter,verse,text FROM verse WHERE book_id = ? AND verse <= ? ORDER BY book_id, chapter, verse ", new String[] {cBookId, MAX_VERSES_PER_CHAPTER.toString()});
-		try {
-			if (cursor.moveToFirst()) {
-				while (!cursor.isAfterLast()) {
-					id = cursor.getInt(0);
-					book_id = cursor.getInt(1);
-					chapter = cursor.getInt(2);
-					chapterVerse = new ArrayList<BibleVerse>();
-					
-					while (!cursor.isAfterLast() && cursor.getInt(2) == chapter) {
-						chapterVerse.add(new BibleVerse(cursor.getInt(2), cursor.getInt(3), cursor.getString(4)));
-						cursor.moveToNext();
-					}
-
-					mChapterArr.add(new BibleChapter(id,book_id,chapter,chapterVerse));
-					if (chapterVerse.size() <= 0)
-						cursor.moveToNext();
-				}
-			}
-		} finally {
-			cursor.close();
-		}
 
 		for (int i = 0; i < mChapterArr.size(); i++) {
 			Integer item = mChapterArr.get(i).getChapter();
@@ -99,34 +71,36 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 	@Override
 	// create a new TextView for each item referenced by the Adapter
 	public View getView(int position, View convertView, ViewGroup parent) {
+		ViewHolder vHolder;
 		String cText = "";
-		View customView;
 		LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		Typeface tf = Typefaces.get(mContext, "fonts/exo200.ttf");
+		Typeface tfThin = Typefaces.get(mContext, MainActivity.FONT_ROBOTO_100_PATH);
+		Typeface tfThick = Typefaces.get(mContext, MainActivity.FONT_MAIN_FONT);
 		ArrayList<BibleVerse> chapVerses = mChapterArr.get(position).getArrListText();
 		
 		// if it's not recycled, initialize some attributes
 		if (convertView == null) {
-			customView = inflater.inflate(R.layout.chapter_list_row, null);
-		} else {
-			customView = convertView;
-		}
+			convertView = inflater.inflate(R.layout.chapter_list_row, null);
+			vHolder = new ViewHolder();
+			vHolder.chapterNum = (TextView) convertView.findViewById(R.id.lblChapterNum);
+			vHolder.chapterNum.setTypeface(tfThick);
+			vHolder.chapterNum.setTextColor(Color.BLACK);
+			
+			vHolder.chapterText = (TextView) convertView.findViewById(R.id.lblChapterTextView);
+			vHolder.chapterText.setTypeface(tfThin);
+			vHolder.chapterText.setTextColor(Color.DKGRAY);
+			
+			convertView.setTag(vHolder);
+		} else
+			vHolder = (ViewHolder) convertView.getTag();
 		
 		for (int i = 0; i < chapVerses.size() ; i++)
 			cText = cText.concat(chapVerses.get(i).getText());
 		
-		// Busca as views de texto para setar o texto
-		TextView chapterNum = (TextView) customView.findViewById(R.id.lblChapterNum);
-		TextView chapterText = (TextView) customView.findViewById(R.id.lblChapterTextView);
+		vHolder.chapterNum.setText(mChapterArr.get(position).getChapter().toString());
+		vHolder.chapterText.setText(cText);
 		
-		chapterNum.setText(mChapterArr.get(position).getChapter().toString());
-		chapterNum.setTypeface(tf);
-		chapterNum.setTextColor(Color.BLACK);
-		chapterText.setText(cText);
-		chapterText.setTypeface(tf);
-		chapterText.setTextColor(Color.DKGRAY);
-		
-		return customView;
+		return convertView;
 	}
 
 	@Override
