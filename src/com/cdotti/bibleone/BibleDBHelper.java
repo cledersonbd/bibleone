@@ -14,6 +14,11 @@ import android.util.Log;
 public class BibleDBHelper extends SQLiteOpenHelper{
 
 	private Context mContext;
+	
+	private static BibleDBHelper mInstance = null;
+	
+	private static SQLiteDatabase mDB = null;
+	
 	private static final int DB_VERSION = 1;
 	
 	private static final String CLASS_TAG = "BibleDBHelper";
@@ -23,50 +28,59 @@ public class BibleDBHelper extends SQLiteOpenHelper{
 	public static final String DB_TESTAMENT_TABLE_NAME = "testment";
 	public static final String DB_VERSES_TABLE_NAME = "verses";
 	
-	public BibleDBHelper(Context context) {
-		super(context, DB_FILENAME, null, DB_VERSION);
+	// Unico metodo que deve ser chamado para buscar instancia
+	// Garante o "Singleton" da conexao
+	public static BibleDBHelper getInstance(Context c) {
+		if (mInstance == null)
+			mInstance = new BibleDBHelper(c);
 		
+		return mInstance;
+	}
+	
+	private BibleDBHelper(Context context) {
+		super(context, DB_FILENAME, null, DB_VERSION);
 		mContext = context;
 	}
 	
 	public SQLiteDatabase openDatabase() {
         File dbFile = mContext.getDatabasePath(DB_FILENAME);
-        SQLiteDatabase db;
         
-        if (!dbFile.exists()) {
-            try {
-            	// Essa funcao faz a magica de criar o path para copia :|  entender isso aqui pelamor!
-            	getWritableDatabase();
-            	
-                copyDatabase(dbFile);
-                db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
-                db.setVersion(DB_VERSION);
-                db.close();
-            } catch (IOException e) {
-                throw new RuntimeException("Error creating source database", e);
-            }
-        } else {
-        	db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
-        	int currVersion = db.getVersion();
-        	db.close();
-        	// Precisa de update
-            if (currVersion < DB_VERSION) {
-            	mContext.deleteDatabase(DB_FILENAME);
-            	try {
-					copyDatabase(dbFile);
-					db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
-	                db.setVersion(DB_VERSION);
-	                db.close();
-				} catch (IOException e) {
-					throw new RuntimeException("Error UPDATING database", e);
-				}
-            }
-            
+        if (mDB == null) {
+	        if (!dbFile.exists()) {
+	            try {
+	            	// Essa funcao faz a magica de criar o path para copia :|  entender isso aqui pelamor!
+	            	getWritableDatabase();
+	            	
+	                copyDatabase(dbFile);
+	                mDB = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
+	                mDB.setVersion(DB_VERSION);
+	                mDB.close();
+	            } catch (IOException e) {
+	                throw new RuntimeException("Error creating source database", e);
+	            }
+	        } else {
+	        	mDB = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
+	        	int currVersion = mDB.getVersion();
+	        	mDB.close();
+	        	// Precisa de update
+	            if (currVersion < DB_VERSION) {
+	            	mContext.deleteDatabase(DB_FILENAME);
+	            	try {
+						copyDatabase(dbFile);
+						mDB = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
+						mDB.setVersion(DB_VERSION);
+						mDB.close();
+					} catch (IOException e) {
+						throw new RuntimeException("Error UPDATING database", e);
+					}
+	            }
+	            
+	        }
+	        mDB = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
+	        Log.i(CLASS_TAG, "DB version: " + mDB.getVersion());
         }
         
-        db = SQLiteDatabase.openDatabase(dbFile.getAbsolutePath(), null, SQLiteDatabase.OPEN_READWRITE);
-        Log.i(CLASS_TAG, "DB version: " + db.getVersion());
-        return db;
+        return mDB;
     }
 	
     private void copyDatabase(File dbFile) throws IOException {

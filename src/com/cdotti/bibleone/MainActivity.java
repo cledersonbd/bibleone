@@ -1,10 +1,13 @@
 package com.cdotti.bibleone;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -25,8 +28,7 @@ import android.widget.ListView;
 
 public class MainActivity extends BaseActivity 
 			implements	OnItemClickListener, 
-						BookFragment.OnBookSelectedListener,
-						ChapterFragment.OnChapterSelectedListener {
+						BookFragment.OnBookSelectedListener {
 	
 	private Boolean isDualPane = false;
 	
@@ -188,18 +190,35 @@ public class MainActivity extends BaseActivity
 		FragmentManager fm = getSupportFragmentManager();
 		FragmentTransaction ft;
 		String aboutTag = "about";
+		String fragTag = "";
 		
 		/*
-		 * 0 Favoritos
-		 * 1 Configuracoes
-		 * 2 Sobre
+		 * 0 Pesquisar
+		 * 1 Favoritos
+		 * 2 Configuracoes
+		 * 3 Sobre
 		 */
-		// Favoritos
+		// Pesquisar
 		if (position == 0) {
+			Fragment searchFrag = new SearchFragment();
+			fragTag = "search";
+			
+			ft = fm.beginTransaction();
+			ft.setCustomAnimations(R.anim.activity_slide_in_from_right, R.anim.activity_slide_out_to_left,
+					R.anim.activity_slide_in_from_left, R.anim.activity_slide_out_to_right);
+			ft.replace(R.id.content_frame, searchFrag, fragTag).addToBackStack(fragTag);
+			// Executa as alteracoes
+			ft.commit();
+			
+			// Fecha a gaveta
+			mDrawerLayout.closeDrawer(Gravity.START);
+		}
+		// Favoritos
+		else if (position == 1) {
 			startActivity(new Intent(getApplicationContext(), VerseFavActivity.class));
 		}
-		// COnfiguracoes
-		else if (position == 1){
+		// Configuracoes
+		else if (position == 2){
 			/*
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {				
 				ft = fm.beginTransaction();
@@ -214,7 +233,7 @@ public class MainActivity extends BaseActivity
 				
 			
 		}
-		else if (position == 2 && fm.findFragmentByTag(aboutTag) == null) {
+		else if (position == 3 && fm.findFragmentByTag(aboutTag) == null) {
 			String versionName;
 			Fragment aboutfrag = new AboutFragment();
 			Bundle args = new Bundle();
@@ -249,6 +268,9 @@ public class MainActivity extends BaseActivity
 		FragmentManager fm;
 		FragmentTransaction ft;
 		
+		//new MakeSearchPossible(this).execute();
+		//return;
+		
 		// single-pane layout
 		if (!isDualPane) {
 			Intent intent = new Intent(getApplicationContext(), ChapterActivity.class);
@@ -274,11 +296,94 @@ public class MainActivity extends BaseActivity
 				chapterFrag.updateContent(bookID);	
 			}
 		}
-	}
-
-	@Override
-	public void onChapterSelected(Integer bookid, Integer chapterid) {
 		
+	}
+	
+	public class MakeSearchPossible extends AsyncTask<Void, Integer, Exception> {
+		private Activity moActivity;
+		private BibleVerseDAO bibleVerseDAO;
+		private KeywordDAO keyDAO;
+		private ProgressDialog mProgressDialog;
+		private int nMAXLivro = 66;
+		
+		public MakeSearchPossible(Activity a) {
+			moActivity = a;
+			bibleVerseDAO = new BibleVerseDAO(getApplicationContext());
+			keyDAO = new KeywordDAO(getApplicationContext());
+		}
+		
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			
+			mProgressDialog = new ProgressDialog(moActivity);
+			mProgressDialog.setMessage("Aguarde. Construindo palavras chave...");
+			mProgressDialog.setCancelable(false);
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+			//mProgressDialog.setProgress(0);
+			//mProgressDialog.setMax(nMAXLivro);
+			mProgressDialog.show();
+		}
+		
+		@Override
+		protected Exception doInBackground(Void... params) {
+			/*
+			ArrayList<BibleVerse> mArrVerse = bibleVerseDAO.getAllVerse();
+			
+			mProgressDialog.setProgress(0);
+			mProgressDialog.setMax(mArrVerse.size());
+			
+			for (int i = 0; i < mArrVerse.size(); i++) {
+				String[] words = mArrVerse.get(i).getText().split(" ");
+				for (int j = 0; j < words.length; j++) {
+					Keyword keyword = new Keyword(null, mArrVerse.get(i).getID(), 
+							words[j].replace(".", "").replace(",", "").replace(";", "").replace(":", "").
+							replace("\"", ""));
+					if (!keyDAO.insert(keyword)) {
+						return new Exception("Pau na hora de inserir " + words[j]);
+					}
+				}
+				mProgressDialog.setProgress(i);
+			}
+			*/
+			//ArrayList<BibleVerse> mArrVerse;
+			//ArrayList<BibleChapter> mArrChapter;
+			/*
+			for (int x = 1; x <= 66; x++ ) {
+				mArrChapter = bibleVerseDAO.getBookChapter(x, 200);
+				mProgressDialog.setProgress(x);
+				for (int y = 0; y < mArrChapter.size(); y++) {
+					mArrVerse = mArrChapter.get(y).getArrListText();
+					
+					for (int i = 0; i < mArrVerse.size(); i++) {
+						String[] words = mArrVerse.get(i).getText().split(" ");
+						for (int j = 0; j < words.length; j++) {
+							Keyword keyword = new Keyword(null, mArrVerse.get(i).getID(), 
+									words[j].replace(".", "").replace(",", "").replace(";", "").replace(":", "").
+									replace("\"", ""));
+							if (!keyDAO.insert(keyword)) {
+								return new Exception("Pau na hora de inserir " + words[j]);
+							}
+						}
+					}
+				}
+			}
+			*/
+			
+			return null;
+		}
+		
+		@Override
+		protected void onPostExecute(Exception result) {
+			super.onPostExecute(result);
+			
+			if (keyDAO.getAll().size() > 0)
+				if (mProgressDialog.isShowing()) {
+					mProgressDialog.setMessage("Concluido");
+					mProgressDialog.dismiss();
+				}
+				
+		}
 		
 	}
 }

@@ -28,7 +28,7 @@ public class BibleVerseDAO {
 	 * @return Retorna um arraylist contendo os versiculos de determinado livro/capitulo
 	 */
 	public ArrayList<BibleVerse> getAllBookChapter(Integer _bookID, Integer _chapterNum) {
-		SQLiteDatabase db = new BibleDBHelper(mContext).openDatabase();
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
 		Cursor cursor = db.query(TABLE, 
 				null,	// columns 
 				F_BOOKID + "=? AND " + F_CHAPTER + "=? " ,	// where 
@@ -43,6 +43,7 @@ public class BibleVerseDAO {
 		if (cursor.moveToFirst()) {
 			while (!cursor.isAfterLast()) {
 				verse = new BibleVerse( 
+						cursor.getInt(cursor.getColumnIndex(F_ID)),
 						cursor.getInt(cursor.getColumnIndex(F_BOOKID)),  
 						cursor.getInt(cursor.getColumnIndex(F_CHAPTER)), 
 						cursor.getInt(cursor.getColumnIndex(F_VERSE)), 
@@ -66,10 +67,10 @@ public class BibleVerseDAO {
 	 * @since 2014-04-09
 	 * @return Retorna um arraylist contendo os versiculos de determinado livro/capitulo
 	 */
-	public ArrayList<BibleChapter> getChapter(Integer _bookID, Integer maxNumVerse) {
+	public ArrayList<BibleChapter> getBookChapter(Integer _bookID, Integer maxNumVerse) {
 		String cWhere = F_BOOKID + "=? " 
 				+ (maxNumVerse != null ? " AND " + F_VERSE + "<=?" : "");
-		SQLiteDatabase db = new BibleDBHelper(mContext).openDatabase();
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
 		Cursor cursor = db.query(TABLE, 
 				null,	// columns 
 				cWhere,	// where 
@@ -93,6 +94,7 @@ public class BibleVerseDAO {
 				
 				while (!cursor.isAfterLast() && cursor.getInt(cursor.getColumnIndex(F_CHAPTER)) == chapterNum) {
 					verse = new BibleVerse(
+							id,
 							bookID,  
 							chapterNum, 
 							verseNum, 
@@ -115,6 +117,43 @@ public class BibleVerseDAO {
 		
 		return null;
 	}
+	
+	public ArrayList<BibleVerse> getAllVerse() {
+		String cSQL = "SELECT * FROM VERSE ";
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
+		Cursor cursor = db.rawQuery(cSQL, null);
+		
+		BibleVerse verse;		
+		ArrayList<BibleVerse> mVerseList = new ArrayList<BibleVerse>();
+		
+		if (cursor.moveToFirst()) {
+			while (!cursor.isAfterLast()) {
+				int id = cursor.getInt(cursor.getColumnIndex(F_ID));
+				int bookID = cursor.getInt(cursor.getColumnIndex(F_BOOKID));  
+				int chapterNum = cursor.getInt(cursor.getColumnIndex(F_CHAPTER));
+				int verseNum = cursor.getInt(cursor.getColumnIndex(F_VERSE));
+				String verseText = cursor.getString(cursor.getColumnIndex(F_VERSETEXT));
+				verse = new BibleVerse(
+						id,
+						bookID,  
+						chapterNum, 
+						verseNum, 
+						verseText);
+				
+				mVerseList.add(verse);
+				
+				cursor.moveToNext();
+			}
+		}
+		
+		cursor.close();
+		
+		if (mVerseList.size() > 0)
+			return mVerseList;
+		
+		return null;
+	}	
+	
 	// Nao faz sentido uma funcao de insercao de versiculos
 	/*
 	public boolean insertF(VerseFav newVerse) {

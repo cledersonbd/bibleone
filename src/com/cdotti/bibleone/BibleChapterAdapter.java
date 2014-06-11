@@ -33,7 +33,7 @@ public class BibleChapterAdapter extends BaseAdapter implements SectionIndexer {
 			mContext = c;
 		
 		BibleVerseDAO verseDAO = new BibleVerseDAO(mContext);
-		mChapterArr = verseDAO.getChapter(nBookID, MAX_VERSES_PER_CHAPTER);
+		mChapterArr = verseDAO.getBookChapter(nBookID, MAX_VERSES_PER_CHAPTER);
 		indexer = new HashMap<Integer, Integer>();
 
 		for (int i = 0; i < mChapterArr.size(); i++) {

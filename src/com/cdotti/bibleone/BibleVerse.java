@@ -6,15 +6,17 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class BibleVerse implements Parcelable{
+	private Integer mID;
 	private Integer bookID;
 	private Integer numChapter;
-	private Integer id_numVerse;
+	private Integer numVerse;
 	private String text;
 	
-	public BibleVerse (int _bookID, int _numChapter, int _numVerse, String _text) {
+	public BibleVerse (int _ID, int _bookID, int _numChapter, int _numVerse, String _text) {
+		setID(_ID);
 		setBookID(_bookID);
 		setNumChapter(_numChapter);
-		setId(_numVerse);
+		setNumVerse(_numVerse);
 		setText(_text);
 	}
 	
@@ -30,11 +32,11 @@ public class BibleVerse implements Parcelable{
 		this.numChapter = numChapter;
 	}
 	
-	public Integer getId() {
-		return id_numVerse;
+	public Integer getNumVerse() {
+		return numVerse;
 	}
-	public void setId(Integer id) {
-		this.id_numVerse = id;
+	public void setNumVerse(Integer id) {
+		this.numVerse = id;
 	}
 
 	public String getText() {
@@ -53,8 +55,16 @@ public class BibleVerse implements Parcelable{
 		this.bookID = bookID;
 	}
 
+	public Integer getID() {
+		return mID;
+	}
+
+	public void setID(Integer mID) {
+		this.mID = mID;
+	}
+
 	public boolean isHeader() {
-		return getId() < 0 && getNumChapter() > 0;
+		return getNumVerse() < 0 && getNumChapter() > 0;
 	}
 	
 	/** * * Called from the constructor to create this 
@@ -66,7 +76,7 @@ public class BibleVerse implements Parcelable{
 		// We just need to read back each 
 		// field in the order that it was 
 		// written to the parcel 
-		id_numVerse = in.readInt();
+		numVerse = in.readInt();
 		text = in.readString();
 	}
 
@@ -81,7 +91,7 @@ public class BibleVerse implements Parcelable{
 		// We just need to write each field into the
 		// parcel. When we read from parcel, they
 		// will come back in the same order
-		dest.writeInt(id_numVerse);
+		dest.writeInt(numVerse);
 		dest.writeString(text);		
 	}
 

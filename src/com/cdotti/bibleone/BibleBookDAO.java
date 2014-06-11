@@ -29,7 +29,7 @@ public class BibleBookDAO {
 	 * @return Retorna um arraylist contendo os livros da biblia
 	 */
 	public ArrayList<BibleBook> getAll(Integer _testmentID) {
-		SQLiteDatabase db = new BibleDBHelper(mContext).openDatabase();
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
 		Cursor cursor = db.query(TABLE, 
 				new String[] {F_ID, F_NAME},	// columns 
 				F_TESTAMENTID + "=?" ,			// where 

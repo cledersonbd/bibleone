@@ -86,7 +86,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 	 */
 	private void buildSections() {
 		for (int i = 0; i < mVerseArrList.size(); i++) {
-			Integer item = mVerseArrList.get(i).getId();
+			Integer item = mVerseArrList.get(i).getNumVerse();
 			Integer chave = (Integer) i / DIV_PAGE;
 			if (!indexer.containsKey(chave))
 				indexer.put(chave, item);
@@ -150,7 +150,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 	public long getItemId(int position) {
 		Integer id = null;
 		if (position < mVerseArrList.size())
-			id = mVerseArrList.get(position).getId();
+			id = mVerseArrList.get(position).getNumVerse();
 		return id;
 	}	
 	
@@ -197,7 +197,7 @@ public class BibleVerseAdapter extends BaseAdapter implements SectionIndexer, St
 			} else
 				vHolder = (ViewHolderItem) convertView.getTag();
 			
-			vHolder.verseNum.setText(verse.getId().toString());
+			vHolder.verseNum.setText(verse.getNumVerse().toString());
 			vHolder.verseText.setText(verse.getText());
 			// Seta o objeto versiculo como tag do botao
 			vHolder.btnOptFav.setTag(verse);

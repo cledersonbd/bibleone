@@ -39,7 +39,7 @@ public class VerseFav implements Parcelable {
 		setBookID(bVerse.getBookID());
 		setBookName("");
 		setNumChapter(bVerse.getNumChapter());
-		setVerseNum(bVerse.getId());
+		setVerseNum(bVerse.getNumVerse());
 		setText(bVerse.getText());
 		//setDate(dt);
 	}

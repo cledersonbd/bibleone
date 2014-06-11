@@ -41,7 +41,7 @@ public class FavVerseDAO {
 	 * @return Retorna um arraylist contendo os versiculos favoritos gravados em banco
 	 */
 	public ArrayList<VerseFav> getAllF() {
-		SQLiteDatabase db = new BibleDBHelper(mContext).openDatabase();
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
 		/*
 		Cursor cursor = db.query(TABLE, 
 				null, TYPE+" LIKE ? " , new String[] {"%"+cRegType+"%"}, 
@@ -89,7 +89,7 @@ public class FavVerseDAO {
 	}
 	
 	public boolean insertF(VerseFav newVerse) {
-		SQLiteDatabase db = new BibleDBHelper(mContext).openDatabase();
+		SQLiteDatabase db = BibleDBHelper.getInstance(mContext).openDatabase();
 		ContentValues values = new ContentValues();
 		long result = -1;
 		
